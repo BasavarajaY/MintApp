@@ -1,0 +1,22 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "none",
+  "routes": [
+    {
+      "source": "^/api/(.*)$",
+      "target": "/api/$1",
+      "destination": "mint_service",
+      "csrfProtection": false
+    },
+    {
+      "source": "^(?!/api)(?!.*\\.[a-zA-Z0-9]+$).*",
+      "target": "/index.html",
+      "localDir": "build"
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "localDir": "build"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "approuter",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node node_modules/@sap/approuter/approuter.js"
+  },
+  "dependencies": {
+    "@sap/approuter": "^11.6.1",
+    "cf": "^0.0.3",
+    "cf-cli": "^0.2.0",
+    "cloudfoundry-cli": "^0.8.0"
+  }
+}

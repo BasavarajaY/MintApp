@@ -1,0 +1,14 @@
+.dropdown-menu {
+    min-width: 180px;
+}
+
+/* App.css */
+.active-top-menu {
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+}
+
+.active-menu {
+    font-weight: bold;
+    border-left: 4px solid transparent;
+}

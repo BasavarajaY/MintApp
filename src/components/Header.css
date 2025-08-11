@@ -1,0 +1,48 @@
+/* src/components/Header.css */
+
+/* Enable dropdown on hover */
+.hover-dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0.1rem;
+}
+
+/* White dropdown background */
+.dropdown-menu {
+    background-color: #fff;
+    min-width: 180px;
+    border-radius: 4px;
+    padding: 0;
+    z-index: 1000;
+}
+
+/* Hover style */
+.dropdown-item {
+    padding: 10px 16px;
+    color: #000;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.dropdown-item:hover {
+    background-color: #00bcd4;
+    /* #00AEEF; */
+    color: #fff;
+}
+
+/* Active (selected) dropdown item */
+.dropdown-item.active {
+    background-color: #00bcd4 !important;
+    color: #fff !important;
+}
+
+.active-menu {
+    background-color: #e9f5ff !important;
+    color: #007bff !important;
+    font-weight: bold;
+}
+
+.active-top-menu {
+    color: #00bcd4 !important;
+    font-weight: bold;
+    padding-bottom: 2px;
+}

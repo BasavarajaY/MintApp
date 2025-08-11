@@ -1,0 +1,21 @@
+applications:
+  - name: mintdemoapp-approuter
+    path: .
+    memory: 128M
+    buildpacks:
+      - nodejs_buildpack
+    routes:
+      - route: mintdemoapp-approuter.cfapps.us10-001.hana.ondemand.com
+    services:
+      - my-xsuaa
+    env:
+      destinations: >
+        [
+          {
+            "name": "mint_service",
+            "url": "https://mint-fastapi-app.cfapps.eu10-004.hana.ondemand.com",
+            "type": "HTTP",
+            "proxyType": "Internet",
+              "authentication": "NoAuthentication"
+          }
+        ]
