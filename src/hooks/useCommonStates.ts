@@ -9,10 +9,14 @@ export const useCommonTableState = <T>(filterKey: keyof T) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isMigrated, setIsMigrated] = useState<boolean>(false);
-  const [sortConfig, setSortConfig] = useState<{ key: keyof T; direction: "asc" | "desc" }>({
-  key: "yourDefaultColumn" as keyof T,
-  direction: "asc",
-});
+  const [sortConfig, setSortConfig] = useState<{
+    key: keyof T;
+    direction: "asc" | "desc";
+  } | null>(null);
+//   const [sortConfig, setSortConfig] = useState<{ key: keyof T; direction: "asc" | "desc" }>({
+//   key: "yourDefaultColumn" as keyof T,
+//   direction: "asc",
+// });
 
   useEffect(() => {
     let filtered = filterBySearch(data, searchTerm, filterKey);

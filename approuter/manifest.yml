@@ -5,9 +5,9 @@ applications:
     buildpacks:
       - nodejs_buildpack
     routes:
-      - route: mintdemoapp-approuter.cfapps.us10-001.hana.ondemand.com
+      - route: mintdemoapp-approuter.cfapps.eu10-004.hana.ondemand.com
     services:
-      - my-xsuaa
+      - myXsuaaService
     env:
       destinations: >
         [
@@ -16,6 +16,6 @@ applications:
             "url": "https://mint-fastapi-app.cfapps.eu10-004.hana.ondemand.com",
             "type": "HTTP",
             "proxyType": "Internet",
-              "authentication": "NoAuthentication"
+            "authentication": "NoAuthentication"
           }
         ]

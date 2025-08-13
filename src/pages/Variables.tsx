@@ -2,7 +2,12 @@
 
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { createVariables, fetchVariables, migrateVariables } from "../api/auth";
+import {
+  createVariables,
+  fetchVariables,
+  fetchVariablesTaskStatus,
+  migrateVariables,
+} from "../api/auth";
 import AppSpinner from "../components/common/AppSpinner";
 import { Form } from "react-bootstrap";
 import VariableModal from "./VariableModal";
@@ -13,6 +18,8 @@ import StatusProgressBar from "../components/common/StatusProgressBar";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
 import { useMigration } from "../hooks/useMigration";
+import TableSortable from "../components/common/TableSortable";
+import MessageDialog from "../components/common/MessageDialogProps";
 
 const Variables: React.FC = () => {
   const {
@@ -26,6 +33,8 @@ const Variables: React.FC = () => {
     setError,
     searchTerm,
     setSearchTerm,
+    requestSort,
+    sortConfig,
     selectedItems: selectedVars,
     setSelectedItems: setSelectedVars,
     handleSelect,
@@ -34,10 +43,17 @@ const Variables: React.FC = () => {
     setIsMigrated,
   } = useCommonTableState<VariableItem>("VariableName");
   const [showModal, setShowModal] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  // const [dialogType, setDialogType] = useState<"success" | "error">("success");
+  // const [dialogMessage, setDialogMessage] = useState("");
 
   // ✅ Extract WebSocket handler and wrap it
   const { connectWebSocket: rawConnectWebSocket } =
-    useWebSocketManager<VariableItem>(setVariablesData, setFilteredVars);
+    useWebSocketManager<VariableItem>(
+      setVariablesData,
+      setFilteredVars,
+      fetchVariablesTaskStatus
+    );
 
   const connectWebSocket = useCallback(
     (taskId: string) => rawConnectWebSocket(taskId),
@@ -67,6 +83,7 @@ const Variables: React.FC = () => {
     } catch (err: any) {
       console.error("Error fetching variables:", err);
       setError("Failed to load variable data.");
+      setShowDialog(true);
     } finally {
       setLoading(false);
     }
@@ -120,10 +137,22 @@ const Variables: React.FC = () => {
   };
 
   if (loading) return <AppSpinner />;
-  if (error) return <div className="text-danger">{error}</div>;
+  // // if (error) return <div className="text-danger">{error}</div>;
+  // <MessageDialog
+  //   show={showDialog}
+  //   onClose={() => setShowDialog(false)}
+  //   type="success"
+  //   message="Data saved successfully!"
+  // />;
 
   return (
     <div className="p-3">
+      <MessageDialog
+        show={showDialog}
+        onClose={() => setShowDialog(false)}
+        type={error ? "error" : "success"} // or however you determine type
+        message={error || "Data saved successfully!"}
+      />
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="mb-0" style={{ color: "#003DA5" }}>
           Variables
@@ -209,11 +238,37 @@ const Variables: React.FC = () => {
                     }
                   />
                 </th>
-                <th className="py-2 px-3">Variable Name</th>
-                <th className="py-2 px-3">Integration Flow</th>
-                <th className="py-2 px-3">Visibility</th>
-                <th className="py-2 px-3">Updated At</th>
-                <th className="py-2 px-3">Retain Until</th>
+                {/* <th className="py-2 px-3">Variable Name</th> */}
+                <TableSortable<VariableItem>
+                  columnKey="VariableName"
+                  label="Variable Name"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
+                <TableSortable<VariableItem>
+                  columnKey="IntegrationFlow"
+                  label="Integration Flow"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
+                <TableSortable<VariableItem>
+                  columnKey="Visibility"
+                  label="Visibility"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
+                <TableSortable<VariableItem>
+                  columnKey="UpdatedAt"
+                  label="Updated At"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
+                <TableSortable<VariableItem>
+                  columnKey="RetainUntil"
+                  label="Retain Until"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
                 {isMigrated && <th className="py-2 px-3">Status</th>}
                 {isMigrated && <th className="py-2 px-3">Progress</th>}
               </tr>

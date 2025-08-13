@@ -28,3 +28,40 @@ export interface UserCredItem {
   process_status?: string;
   progress_percentage?: number;
 }
+export interface OAuthCredItem {
+  Name: string;
+  Description: string;
+  TokenServiceUrl: string;
+  ClientId: string;
+  Scope: string;
+  Resource: string;
+  task_id?: string;
+  process_status?: string;
+  progress_percentage?: number;
+}
+export interface NumberRangesItem {
+  Name: string;
+  Description: string;
+  MinValue: string;
+  MaxValue: string;
+  Rotate: string;
+  CurrentValue: string;
+  FieldLength: string;
+  DeployedBy: string;
+  DeployedOn: Date;
+  task_id?: string;
+  process_status?: string;
+  progress_percentage?: number;
+}
+export interface ValueMappingsItem {
+  Id: string;
+  Version: string;
+  PackageId: string;
+  Name: string;
+  Description: string;
+  ArtifactContent: string;
+  task_id?: string;
+  process_status?: string;
+  progress_percentage?: number;
+}
+

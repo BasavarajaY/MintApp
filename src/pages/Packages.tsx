@@ -25,7 +25,6 @@ const Packages: React.FC = () => {
     setSelectedItems: setSelectedPackages,
     handleSelect,
     handleSelectAll,
-    isMigrated,
     setIsMigrated,
   } = useCommonTableState<PackageItem>("Name");
 
@@ -36,7 +35,11 @@ const Packages: React.FC = () => {
 
   // ✅ Extract WebSocket handler and wrap it
   const { connectWebSocket: rawConnectWebSocket } =
-    useWebSocketManager<PackageItem>(setPackageData, setFilteredPackages);
+    useWebSocketManager<PackageItem>(
+      setPackageData,
+      setFilteredPackages,
+      fetchPackages
+    );
 
   const connectWebSocket = useCallback(
     (taskId: string) => rawConnectWebSocket(taskId),

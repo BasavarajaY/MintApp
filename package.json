@@ -1,9 +1,8 @@
 {
-  "name": "ummdemoapp",
+  "name": "mintdemoapp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "tenent_proxy": "https://mint-fastapi-app.cfapps.eu10-004.hana.ondemand.com",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -20,6 +19,7 @@
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.7.1"
   },
   "devDependencies": {

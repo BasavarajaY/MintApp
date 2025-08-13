@@ -8,7 +8,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<LoginForm />} />
+        <Route path="/app" element={<LoginForm />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
       </Routes>
       <Toaster position="bottom-right" />

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { fetchTaskStatus } from "../api/auth";
+import { fetchValueMappingsTaskStatus } from "../api/auth";
 
 interface StatusUpdate {
   process_key: string;
@@ -27,7 +27,7 @@ export function usePollingStatus({
 
     const poll = async () => {
       try {
-        const response = await fetchTaskStatus(taskId);
+        const response = await fetchValueMappingsTaskStatus(taskId);
         const data = response.data as StatusUpdate[];
 
         const allDone = data.every((item) => item.process_status === "success" && item.progress_percentage === 100);

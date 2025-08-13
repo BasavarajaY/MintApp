@@ -9,5 +9,10 @@
     "cf": "^0.0.3",
     "cf-cli": "^0.2.0",
     "cloudfoundry-cli": "^0.8.0"
-  }
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

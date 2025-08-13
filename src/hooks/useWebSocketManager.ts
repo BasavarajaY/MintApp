@@ -1,18 +1,17 @@
-// src/hooks/useWebSocketManager.ts
 import { useCallback } from "react";
 import toast from "react-hot-toast";
-import { fetchUserCredTaskStatus } from "../api/auth"; // You may need to make this dynamic
 
 export const useWebSocketManager = <T extends { task_id?: string }>(
   setData: React.Dispatch<React.SetStateAction<T[]>>,
-  setFilteredData: React.Dispatch<React.SetStateAction<T[]>>
+  setFilteredData: React.Dispatch<React.SetStateAction<T[]>>,
+  fetchTaskStatus: (taskId: string) => Promise<any>
 ) => {
   const activeSockets = new Map<string, WebSocket>();
 
   const connectWebSocket = useCallback(
     (taskId: string) => {
-      const webSocketURL = "wss://mint-fastapi-app.cfapps.eu10-004.hana.ondemand.com/api/web/websocket/updates";
       // const webSocketURL = import.meta.env.VITE_WEBSOCKET_URL;
+      const webSocketURL = "wss://mint-fastapi-app.cfapps.eu10-004.hana.ondemand.com/api/web/websocket/updates";
       const wsUrl = `${webSocketURL}`;
 
       if (activeSockets.has(taskId)) return;
@@ -24,7 +23,7 @@ export const useWebSocketManager = <T extends { task_id?: string }>(
         console.log(`✅ WebSocket connected for task ${taskId}`);
 
         try {
-          const response = await fetchUserCredTaskStatus(taskId); // You can abstract this API too
+          const response = await fetchTaskStatus(taskId);
           const resultList = response.data.flat();
 
           const updateStatus = (list: T[]) =>
@@ -65,14 +64,11 @@ export const useWebSocketManager = <T extends { task_id?: string }>(
           setData((prev) => updateStatus(prev));
           setFilteredData((prev) => updateStatus(prev));
 
-          if (
-            data.process_status === "success" ||
-            data.process_status === "failed"
-          ) {
+          if (data.process_status === "success" || data.process_status === "failed") {
             ws.close();
             activeSockets.delete(taskId);
 
-            const result = await fetchUserCredTaskStatus(taskId);
+            const result = await fetchTaskStatus(taskId);
             const flat = result.data.flat();
             const taskResult = flat.find((r: any) => r.task_id === data.task_id);
 
@@ -96,7 +92,7 @@ export const useWebSocketManager = <T extends { task_id?: string }>(
         }, 3000);
       };
     },
-    [setData, setFilteredData]
+    [setData, setFilteredData, fetchTaskStatus]
   );
 
   return { connectWebSocket };

@@ -1,8 +1,8 @@
 import { useEffect, useCallback } from "react";
 import {
-  fetchNumberRangesTaskStatus,
-  fetchUserCredentials,
-  migrateUserCreds,
+  fetchOAuthCredentials,
+  fetchOAuthCredTaskStatus,
+  migrateOAuthCreds,
 } from "../api/auth";
 import AppSpinner from "../components/common/AppSpinner";
 import ProfileBanner from "./ProfileBanner";
@@ -10,14 +10,14 @@ import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
 import StatusProgressBar from "../components/common/StatusProgressBar";
-import type { UserCredItem } from "../types";
+import type { OAuthCredItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 
-const UserCredentials: React.FC = () => {
+const OAuthCredentials: React.FC = () => {
   const {
-    data: userCredData,
-    setData: setUserCredData,
+    data: oAuthCredData,
+    setData: setOAuthCredData,
     filteredData: filteredUsers,
     setFilteredData: setFilteredUsers,
     loading,
@@ -34,14 +34,14 @@ const UserCredentials: React.FC = () => {
     handleSelectAll,
     isMigrated,
     setIsMigrated,
-  } = useCommonTableState<UserCredItem>("Name");
+  } = useCommonTableState<OAuthCredItem>("Name");
 
   // ✅ Extract WebSocket handler and wrap it
   const { connectWebSocket: rawConnectWebSocket } =
-    useWebSocketManager<UserCredItem>(
-      setUserCredData,
+    useWebSocketManager<OAuthCredItem>(
+      setOAuthCredData,
       setFilteredUsers,
-      fetchNumberRangesTaskStatus
+      fetchOAuthCredTaskStatus
     );
 
   const connectWebSocket = useCallback(
@@ -50,9 +50,9 @@ const UserCredentials: React.FC = () => {
   );
 
   // ✅ useMigration hook
-  const { handleMigrate } = useMigration<UserCredItem, "Name">({
-    moduleType: "user-credentials",
-    setData: setUserCredData,
+  const { handleMigrate } = useMigration<OAuthCredItem, "Name">({
+    moduleType: "oauth2-credentials",
+    setData: setOAuthCredData,
     setFilteredData: setFilteredUsers,
     connectWebSocket,
     setIsMigrated,
@@ -60,32 +60,32 @@ const UserCredentials: React.FC = () => {
   });
 
   useEffect(() => {
-    const loadUserCreds = async () => {
+    const loadOAuthCreds = async () => {
       try {
-        const response = await fetchUserCredentials();
-        const data = response.data?.result || [];
+        const response = await fetchOAuthCredentials();
+        const data = response.data?.results || [];
         console.log(data);
-        setUserCredData(data);
+        setOAuthCredData(data);
         setFilteredUsers(data);
       } catch (err) {
-        console.error("Error fetching User Credentials:", err);
-        setError("Failed to load User Credentials data.");
+        console.error("Error fetching OAuth Credentials:", err);
+        setError("Failed to load OAuth Credentials data.");
       } finally {
         setLoading(false);
       }
     };
 
-    loadUserCreds();
+    loadOAuthCreds();
   }, []);
 
   useEffect(() => {
-    let filtered = userCredData.filter((v) =>
+    let filtered = oAuthCredData.filter((v) =>
       v.Name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Apply sorting if active
     if (sortConfig) {
-      const key: keyof UserCredItem = sortConfig.key;
+      const key: keyof OAuthCredItem = sortConfig.key;
       const direction = sortConfig.direction;
 
       filtered = [...filtered].sort((a, b) => {
@@ -105,32 +105,7 @@ const UserCredentials: React.FC = () => {
     setSelectedUsers((prevSelected) =>
       prevSelected.filter((name) => filtered.some((item) => item.Name === name))
     );
-  }, [searchTerm, userCredData, sortConfig]);
-
-  // // Handle sort request
-  // const requestSort = (key: keyof UserCredItem) => {
-  //   let direction: "asc" | "desc" = "asc";
-  //   if (
-  //     sortConfig &&
-  //     sortConfig.key === key &&
-  //     sortConfig.direction === "asc"
-  //   ) {
-  //     direction = "desc";
-  //   }
-  //   setSortConfig({ key, direction });
-  // };
-
-  // // Sort arrow indicator
-  // const getSortArrow = (key: keyof UserCredItem) => {
-  //   if (sortConfig?.key === key) {
-  //     return (
-  //       <span style={{ color: "#003DA5" }}>
-  //         {sortConfig.direction === "asc" ? " ▲" : " ▼"}
-  //       </span>
-  //     );
-  //   }
-  //   return <span style={{ color: "#003DA5", opacity: 0.3 }}>▲</span>; // Light faded arrow for inactive columns
-  // };
+  }, [searchTerm, oAuthCredData, sortConfig]);
 
   if (loading) return <AppSpinner />;
   if (error) return <div className="text-danger">{error}</div>;
@@ -158,11 +133,11 @@ const UserCredentials: React.FC = () => {
           <button
             className="btn btn-outline-success fw-bold"
             onClick={() => {
-              handleMigrate(selectedUsers, userCredData, migrateUserCreds);
+              handleMigrate(selectedUsers, oAuthCredData, migrateOAuthCreds);
             }}
             disabled={selectedUsers.length === 0}
             data-bs-toggle="tooltip"
-            title="Migrate selected users"
+            title="Migrate selected OAuth Credentials"
           >
             <i className="bi bi-cloud-upload me-1"></i>
           </button>
@@ -198,44 +173,30 @@ const UserCredentials: React.FC = () => {
                     }
                   />
                 </th>
-                {/* <th
-                  onClick={() => requestSort("Name")}
-                  style={{ cursor: "pointer" }}
-                >
-                  Name{" "}
-                  <span style={{ color: "#003DA5" }}>
-                    {sortConfig?.key === "Name"
-                      ? sortConfig.direction === "asc"
-                        ? "▲"
-                        : "▼"
-                      : "▲"}{" "}
-                  </span>
-                </th> */}
-                <TableSortable<UserCredItem>
+                <TableSortable<OAuthCredItem>
                   columnKey="Name"
                   label="Name"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <TableSortable<UserCredItem>
-                  columnKey="Kind"
-                  label="Type"
-                  sortConfig={sortConfig}
-                  requestSort={requestSort}
-                />
-                <TableSortable<UserCredItem>
+                <TableSortable<OAuthCredItem>
                   columnKey="Description"
                   label="Description"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <TableSortable<UserCredItem>
-                  columnKey="User"
-                  label="User"
+                <TableSortable<OAuthCredItem>
+                  columnKey="TokenServiceUrl"
+                  label="Token Service URL"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <th className="py-2 px-3">Company Id</th>
+                <TableSortable<OAuthCredItem>
+                  columnKey="ClientId"
+                  label="Client ID"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
                 {isMigrated && <th className="py-2 px-3">Status</th>}
                 {isMigrated && <th className="py-2 px-3">Progress</th>}
               </tr>
@@ -260,10 +221,9 @@ const UserCredentials: React.FC = () => {
                       />
                     </td>
                     <td className="py-2 px-3">{user.Name || "—"}</td>
-                    <td className="py-2 px-3">{user.Kind || "—"}</td>
                     <td className="py-2 px-3">{user.Description || "—"}</td>
-                    <td className="py-2 px-3">{user.User || "—"}</td>
-                    <td className="py-2 px-3">{user.CompanyId || "—"}</td>
+                    <td className="py-2 px-3">{user.TokenServiceUrl || "—"}</td>
+                    <td className="py-2 px-3">{user.ClientId || "—"}</td>
                     {isMigrated && (
                       <>
                         <td className="py-2 px-3 text-capitalize">
@@ -306,4 +266,4 @@ const UserCredentials: React.FC = () => {
   );
 };
 
-export default UserCredentials;
+export default OAuthCredentials;

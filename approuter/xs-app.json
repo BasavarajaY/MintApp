@@ -11,12 +11,12 @@
     {
       "source": "^(?!/api)(?!.*\\.[a-zA-Z0-9]+$).*",
       "target": "/index.html",
-      "localDir": "build"
+      "localDir": "dist"
     },
     {
       "source": "^(.*)$",
       "target": "$1",
-      "localDir": "build"
+      "localDir": "dist"
     }
   ]
 }

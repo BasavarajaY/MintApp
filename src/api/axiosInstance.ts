@@ -1,21 +1,24 @@
 // src/api/axiosInstance.ts
 import axios from 'axios';
 
+const baseURL =
+  import.meta.env.VITE_APP_HOST ||
+  (import.meta.env.DEV ? '/api' : '');
+
 const otpInstance = axios.create({
-  baseURL: import.meta.env.App_Host, // ✅ defined in .env file
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 const pageInstance = axios.create({
-  baseURL: import.meta.env.App_Host,
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// 🔐 Add Authorization header dynamically
 pageInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
   if (token) {

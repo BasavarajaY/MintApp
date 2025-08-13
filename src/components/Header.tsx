@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import "./Header.css"; // we'll add this next
@@ -106,6 +106,42 @@ const Header: React.FC<HeaderProps> = ({
                   href="/dashboard/usercredentials"
                 >
                   User Credintials
+                </a>
+              </li>
+              <li>
+                <a
+                  className={`dropdown-item fw-bold ${
+                    isActiveItem("/dashboard/oauthcredentials")
+                      ? "active-menu"
+                      : ""
+                  }`}
+                  href="/dashboard/oauthcredentials"
+                >
+                  OAuth Credintials
+                </a>
+              </li>
+              <li>
+                <a
+                  className={`dropdown-item fw-bold ${
+                    isActiveItem("/dashboard/number-ranges")
+                      ? "active-menu"
+                      : ""
+                  }`}
+                  href="/dashboard/number-ranges"
+                >
+                  Number Ranges
+                </a>
+              </li>
+              <li>
+                <a
+                  className={`dropdown-item fw-bold ${
+                    isActiveItem("/dashboard/value-mappings")
+                      ? "active-menu"
+                      : ""
+                  }`}
+                  href="/dashboard/value-mappings"
+                >
+                  Value Mappings
                 </a>
               </li>
             </ul>

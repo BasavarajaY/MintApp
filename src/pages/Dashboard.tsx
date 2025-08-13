@@ -7,6 +7,9 @@ import Packages from "./Packages";
 import UserCredentials from "./UserCredentials";
 import Variables from "./Variables";
 import { fetchMintProfiles } from "../api/auth";
+import NumberRanges from "./NumberRanges";
+import ValueMappings from "./ValueMappings";
+import OAuthCredentials from "./OAuthCredentials";
 
 const Dashboard: React.FC = () => {
   const [showProfSettingModal, setShowProfSettingModal] = useState(false);
@@ -55,6 +58,9 @@ const Dashboard: React.FC = () => {
           <Route path="packages" element={<Packages />} />
           <Route path="variables" element={<Variables />} />
           <Route path="usercredentials" element={<UserCredentials />} />
+          <Route path="oauthcredentials" element={<OAuthCredentials />} />
+          <Route path="number-ranges" element={<NumberRanges />} />
+          <Route path="value-mappings" element={<ValueMappings />} />
           {/* <Route path="" element={<div>Select an option from the menu.</div>} /> */}
           <Route
             path=""
