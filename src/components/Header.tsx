@@ -51,7 +51,9 @@ const Header: React.FC<HeaderProps> = ({
           <div className="dropdown hover-dropdown">
             <span
               className={`fw-semibold ${
-                currentPath === "/dashboard" ? "active-top-menu" : "text-white"
+                currentPath === "/app/dashboard"
+                  ? "active-top-menu"
+                  : "text-white"
               }`}
               role="button"
             >
@@ -64,9 +66,9 @@ const Header: React.FC<HeaderProps> = ({
             <span
               className={`fw-semibold ${
                 isActiveTopMenu([
-                  "/dashboard/variables",
-                  "/dashboard/packages",
-                  "/dashboard/usercredentials",
+                  "/app/dashboard/variables",
+                  "/app/dashboard/packages",
+                  "/app/dashboard/usercredentials",
                 ])
                   ? "active-top-menu"
                   : "text-white"
@@ -79,9 +81,11 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/variables") ? "active-menu" : ""
+                    isActiveItem("/app/dashboard/variables")
+                      ? "active-menu"
+                      : ""
                   }`}
-                  href="/dashboard/variables"
+                  href="/app/dashboard/variables"
                 >
                   Variables
                 </a>
@@ -89,9 +93,9 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/packages") ? "active-menu" : ""
+                    isActiveItem("/app/dashboard/packages") ? "active-menu" : ""
                   }`}
-                  href="/dashboard/packages"
+                  href="/app/dashboard/packages"
                 >
                   Packages
                 </a>
@@ -99,11 +103,11 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/usercredentials")
+                    isActiveItem("/app/dashboard/usercredentials")
                       ? "active-menu"
                       : ""
                   }`}
-                  href="/dashboard/usercredentials"
+                  href="/app/dashboard/usercredentials"
                 >
                   User Credintials
                 </a>
@@ -111,11 +115,11 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/oauthcredentials")
+                    isActiveItem("/app/dashboard/oauthcredentials")
                       ? "active-menu"
                       : ""
                   }`}
-                  href="/dashboard/oauthcredentials"
+                  href="/app/dashboard/oauthcredentials"
                 >
                   OAuth Credintials
                 </a>
@@ -123,11 +127,11 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/number-ranges")
+                    isActiveItem("/app/dashboard/number-ranges")
                       ? "active-menu"
                       : ""
                   }`}
-                  href="/dashboard/number-ranges"
+                  href="/app/dashboard/number-ranges"
                 >
                   Number Ranges
                 </a>
@@ -135,11 +139,11 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/value-mappings")
+                    isActiveItem("/app/dashboard/value-mappings")
                       ? "active-menu"
                       : ""
                   }`}
-                  href="/dashboard/value-mappings"
+                  href="/app/dashboard/value-mappings"
                 >
                   Value Mappings
                 </a>
@@ -151,7 +155,10 @@ const Header: React.FC<HeaderProps> = ({
           <div className="dropdown hover-dropdown">
             <span
               className={`fw-semibold ${
-                isActiveTopMenu(["/dashboard/tenants", "/dashboard/profiles"])
+                isActiveTopMenu([
+                  "/app/dashboard/tenants",
+                  "/app/dashboard/profiles",
+                ])
                   ? "active-top-menu"
                   : "text-white"
               }`}
@@ -163,9 +170,9 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/tenants") ? "active-menu" : ""
+                    isActiveItem("/app/dashboard/tenants") ? "active-menu" : ""
                   }`}
-                  href="/dashboard/tenants"
+                  href="/app/dashboard/tenants"
                 >
                   Tenants
                 </a>
@@ -173,9 +180,9 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <a
                   className={`dropdown-item fw-bold ${
-                    isActiveItem("/dashboard/profiles") ? "active-menu" : ""
+                    isActiveItem("/app/dashboard/profiles") ? "active-menu" : ""
                   }`}
-                  href="/dashboard/profiles"
+                  href="/app/dashboard/profiles"
                 >
                   Profiles
                 </a>

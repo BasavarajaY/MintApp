@@ -6,51 +6,61 @@ import Profiles from "./Profiles";
 import Packages from "./Packages";
 import UserCredentials from "./UserCredentials";
 import Variables from "./Variables";
-import { fetchMintProfiles } from "../api/auth";
 import NumberRanges from "./NumberRanges";
 import ValueMappings from "./ValueMappings";
 import OAuthCredentials from "./OAuthCredentials";
+import { useProfileState } from "../hooks/useProfileState";
+import { Spinner } from "react-bootstrap";
 
 const Dashboard: React.FC = () => {
-  const [showProfSettingModal, setShowProfSettingModal] = useState(false);
+  const { showProfSettingModal, setShowProfSettingModal } = useProfileState();
+
+  const [loadingProfileCheck, setLoadingProfileCheck] = useState(true);
+  const [profileExists, setProfileExists] = useState(false);
+
   useEffect(() => {
     const checkProfile = async () => {
       const profileData = sessionStorage.getItem("selectedProfile");
-
       if (!profileData) {
-        try {
-          const response = await fetchMintProfiles();
-          const fetchedProfiles = response.data;
-
-          if (fetchedProfiles.length > 0) {
-            // Auto-select first profile and save it
-            sessionStorage.setItem(
-              "selectedProfile",
-              JSON.stringify(fetchedProfiles[0])
-            );
-            setShowProfSettingModal(false); // no modal needed
-          } else {
-            // No profiles available - force user to select via modal
-            setShowProfSettingModal(true);
-          }
-        } catch (error) {
-          console.error("Failed to fetch profiles", error);
-          // Optionally open modal or handle error accordingly
-          setShowProfSettingModal(true);
-        }
+        setShowProfSettingModal(true); // open modal automatically
+        setProfileExists(false);
+      } else {
+        setProfileExists(true);
       }
+      setLoadingProfileCheck(false);
     };
-
     checkProfile();
-  }, []);
+  }, [setShowProfSettingModal]);
 
+  // Still checking → show loader
+  if (loadingProfileCheck) {
+    return (
+      <div style={{ padding: "20px" }}>
+        <Spinner />
+      </div>
+    );
+  }
+
+  // No profile → only header + modal, block routes
+  if (!profileExists) {
+    return (
+      <div>
+        <Header
+          showProfSettingModal={showProfSettingModal}
+          setShowProfSettingModal={setShowProfSettingModal}
+        />
+        {/* Modal opens automatically */}
+      </div>
+    );
+  }
+
+  // Profile exists → load routes
   return (
     <div>
       <Header
         showProfSettingModal={showProfSettingModal}
         setShowProfSettingModal={setShowProfSettingModal}
       />
-
       <div>
         <Routes>
           <Route path="tenants" element={<Tenants />} />
@@ -61,15 +71,7 @@ const Dashboard: React.FC = () => {
           <Route path="oauthcredentials" element={<OAuthCredentials />} />
           <Route path="number-ranges" element={<NumberRanges />} />
           <Route path="value-mappings" element={<ValueMappings />} />
-          {/* <Route path="" element={<div>Select an option from the menu.</div>} /> */}
-          <Route
-            path=""
-            element={
-              showProfSettingModal ? null : (
-                <Navigate to="/dashboard/variables" replace />
-              )
-            }
-          />
+          <Route index element={<Navigate to="tenants" replace />} />
         </Routes>
       </div>
     </div>

@@ -53,7 +53,7 @@ const LoginForm: React.FC = () => {
       if (!accessToken) throw new Error("Access token not found in response");
 
       localStorage.setItem("accessToken", accessToken);
-      navigate("/dashboard");
+      navigate("/app/dashboard");
     } catch (error) {
       console.error("OTP verification failed:", error);
       toast.error("Invalid password or verification failed.");

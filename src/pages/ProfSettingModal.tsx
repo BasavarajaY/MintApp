@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { fetchMintProfiles } from "../api/auth";
+import { useNavigate } from "react-router-dom";
 
 interface Profile {
   mint_profile_id?: number;
@@ -22,6 +23,8 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
     number | undefined
   >(undefined);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (show) {
@@ -30,6 +33,7 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
   }, [show]);
 
   const loadProfilesAndPreselect = async () => {
+    setLoading(true);
     try {
       const response = await fetchMintProfiles();
       const fetchedProfiles = response.data;
@@ -45,10 +49,19 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
         if (match) {
           setSelectedProfileId(match.mint_profile_id);
           setSelectedProfile(match);
+          return; // ✅ stop here, we already set it
         }
+      }
+
+      // If no stored profile, default to first profile
+      if (fetchedProfiles.length > 0) {
+        setSelectedProfileId(fetchedProfiles[0].mint_profile_id);
+        setSelectedProfile(fetchedProfiles[0]);
       }
     } catch (error) {
       console.error("Error fetching profiles:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,6 +83,7 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
     });
 
     onClose();
+    navigate("/app/dashboard/tenants", { replace: true });
   };
 
   return (
@@ -95,26 +109,34 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
           </Form.Select>
         </Form.Group>
 
-        {selectedProfile && (
-          <div
-            className="mt-3 p-3 border rounded"
-            style={{
-              backgroundColor: "#9eeaf9",
-            }}
-          >
-            <h5>{selectedProfile.mint_profile_name}</h5>
-            <p>
-              Environment:{" "}
-              {selectedProfile.mint_profile_environment_id || "N/A"}
-            </p>
-            <p>
-              Source: {selectedProfile.mint_profile_source_runtime || "N/A"}
-            </p>
-            <p>
-              Destination:{" "}
-              {selectedProfile.mint_profile_destination_runtime || "N/A"}
-            </p>
+        {loading ? (
+          <div className="d-flex justify-content-center align-items-center p-4">
+            <Spinner />
           </div>
+        ) : (
+          <>
+            {selectedProfile && (
+              <div
+                className="mt-3 p-3 border rounded"
+                style={{
+                  backgroundColor: "#9eeaf9",
+                }}
+              >
+                <h5>{selectedProfile.mint_profile_name}</h5>
+                <p>
+                  Environment:{" "}
+                  {selectedProfile.mint_profile_environment_id || "N/A"}
+                </p>
+                <p>
+                  Source: {selectedProfile.mint_profile_source_runtime || "N/A"}
+                </p>
+                <p>
+                  Destination:{" "}
+                  {selectedProfile.mint_profile_destination_runtime || "N/A"}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </Modal.Body>
       <Modal.Footer>

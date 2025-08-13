@@ -20,6 +20,7 @@ import { useWebSocketManager } from "../hooks/useWebSocketManager";
 import { useMigration } from "../hooks/useMigration";
 import TableSortable from "../components/common/TableSortable";
 import MessageDialog from "../components/common/MessageDialogProps";
+import { useProfileState } from "../hooks/useProfileState";
 
 const Variables: React.FC = () => {
   const {
@@ -44,6 +45,7 @@ const Variables: React.FC = () => {
   } = useCommonTableState<VariableItem>("VariableName");
   const [showModal, setShowModal] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const { checkProfile } = useProfileState();
   // const [dialogType, setDialogType] = useState<"success" | "error">("success");
   // const [dialogMessage, setDialogMessage] = useState("");
 
@@ -71,7 +73,15 @@ const Variables: React.FC = () => {
   });
 
   useEffect(() => {
-    loadVariables();
+    // Check if profile exists before API call
+    const init = async () => {
+      const hasProfile = await checkProfile();
+      if (hasProfile) {
+        await loadVariables();
+      }
+    };
+    init();
+    // loadVariables();
   }, []);
 
   const loadVariables = async () => {
