@@ -1,79 +1,98 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "../components/Header";
-import Tenants from "./Tenants";
-import Profiles from "./Profiles";
-import Packages from "./Packages";
-import UserCredentials from "./UserCredentials";
-import Variables from "./Variables";
-import NumberRanges from "./NumberRanges";
-import ValueMappings from "./ValueMappings";
-import OAuthCredentials from "./OAuthCredentials";
 import { useProfileState } from "../hooks/useProfileState";
-import { Spinner } from "react-bootstrap";
+import { fetchLoggedInUserData } from "../api/auth";
+
+// Lazy imports
+const Tenants = lazy(() => import("./Tenants"));
+const Profiles = lazy(() => import("./Profiles"));
+const Packages = lazy(() => import("./Packages"));
+const UserCredentials = lazy(() => import("./UserCredentials"));
+const Variables = lazy(() => import("./Variables"));
+const NumberRanges = lazy(() => import("./NumberRanges"));
+const ValueMappings = lazy(() => import("./ValueMappings"));
+const OAuthCredentials = lazy(() => import("./OAuthCredentials"));
+const DataStores = lazy(() => import("./DataStores"));
+const PublicCertificates = lazy(() => import("./PublicCertificates"));
 
 const Dashboard: React.FC = () => {
   const { showProfSettingModal, setShowProfSettingModal } = useProfileState();
-
-  const [loadingProfileCheck, setLoadingProfileCheck] = useState(true);
   const [profileExists, setProfileExists] = useState(false);
 
   useEffect(() => {
-    const checkProfile = async () => {
+    const initialize = async () => {
       const profileData = sessionStorage.getItem("selectedProfile");
+
       if (!profileData) {
-        setShowProfSettingModal(true); // open modal automatically
+        setShowProfSettingModal(true);
         setProfileExists(false);
       } else {
         setProfileExists(true);
       }
-      setLoadingProfileCheck(false);
+
+      try {
+        const response = await fetchLoggedInUserData();
+        const data = response.data?.user || [];
+        sessionStorage.setItem("loggedInUser", JSON.stringify(data));
+      } catch (err) {
+        console.error("Error fetching User Credentials:", err);
+      }
     };
-    checkProfile();
+
+    initialize();
   }, [setShowProfSettingModal]);
 
-  // Still checking → show loader
-  if (loadingProfileCheck) {
-    return (
-      <div style={{ padding: "20px" }}>
-        <Spinner />
-      </div>
-    );
-  }
+  // Prefetch lazy components
+  useEffect(() => {
+    const prefetch = async () => {
+      await Promise.all([
+        import("./Tenants"),
+        import("./Profiles"),
+        import("./Packages"),
+        import("./UserCredentials"),
+        import("./Variables"),
+        import("./NumberRanges"),
+        import("./ValueMappings"),
+        import("./OAuthCredentials"),
+        import("./DataStores"),
+        import("./PublicCertificates"),
+      ]);
+    };
+    prefetch();
+  }, []);
 
-  // No profile → only header + modal, block routes
-  if (!profileExists) {
-    return (
-      <div>
-        <Header
-          showProfSettingModal={showProfSettingModal}
-          setShowProfSettingModal={setShowProfSettingModal}
-        />
-        {/* Modal opens automatically */}
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return <AppSpinner fullScreen text="Loading dashboard..." />;
+  // }
 
-  // Profile exists → load routes
   return (
     <div>
       <Header
         showProfSettingModal={showProfSettingModal}
         setShowProfSettingModal={setShowProfSettingModal}
       />
-      <div>
-        <Routes>
-          <Route path="tenants" element={<Tenants />} />
-          <Route path="profiles" element={<Profiles />} />
-          <Route path="packages" element={<Packages />} />
-          <Route path="variables" element={<Variables />} />
-          <Route path="usercredentials" element={<UserCredentials />} />
-          <Route path="oauthcredentials" element={<OAuthCredentials />} />
-          <Route path="number-ranges" element={<NumberRanges />} />
-          <Route path="value-mappings" element={<ValueMappings />} />
-          <Route index element={<Navigate to="tenants" replace />} />
-        </Routes>
-      </div>
+
+      {profileExists && (
+        <Suspense>
+          <Routes>
+            <Route path="tenants" element={<Tenants />} />
+            <Route path="profiles" element={<Profiles />} />
+            <Route path="packages" element={<Packages />} />
+            <Route path="variables" element={<Variables />} />
+            <Route path="usercredentials" element={<UserCredentials />} />
+            <Route path="oauthcredentials" element={<OAuthCredentials />} />
+            <Route path="number-ranges" element={<NumberRanges />} />
+            <Route path="value-mappings" element={<ValueMappings />} />
+            <Route path="data-stores" element={<DataStores />} />
+            <Route
+              path="public-certificates"
+              element={<PublicCertificates />}
+            />
+            <Route index element={<Navigate to="tenants" replace />} />
+          </Routes>
+        </Suspense>
+      )}
     </div>
   );
 };

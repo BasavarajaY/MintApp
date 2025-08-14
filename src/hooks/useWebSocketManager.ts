@@ -10,8 +10,7 @@ export const useWebSocketManager = <T extends { task_id?: string }>(
 
   const connectWebSocket = useCallback(
     (taskId: string) => {
-      // const webSocketURL = import.meta.env.VITE_WEBSOCKET_URL;
-      const webSocketURL = "wss://mint-fastapi-app.cfapps.eu10-004.hana.ondemand.com/api/web/websocket/updates";
+      const webSocketURL = import.meta.env.VITE_WEBSOCKET_URL;
       const wsUrl = `${webSocketURL}`;
 
       if (activeSockets.has(taskId)) return;

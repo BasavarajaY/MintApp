@@ -107,14 +107,14 @@ const ValueMappings: React.FC = () => {
     );
   }, [searchTerm, ValMapsData, sortConfig]);
 
-  if (loading) return <AppSpinner />;
+  if (loading) return <AppSpinner text="Loading Value Mappings..." />;
   if (error) return <div className="text-danger">{error}</div>;
 
   return (
     <div className="p-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="mb-0" style={{ color: "#003DA5" }}>
-          User Credentials
+          Value Mappings
         </h4>
         <div className="d-flex gap-2 align-items-center">
           <input
@@ -201,7 +201,7 @@ const ValueMappings: React.FC = () => {
               {filteredValMaps.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center text-muted py-3">
-                    No User records found.
+                    No Value Mappings records found.
                   </td>
                 </tr>
               ) : (

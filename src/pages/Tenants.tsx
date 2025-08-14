@@ -126,7 +126,7 @@ const Tenants: React.FC = () => {
     }
   };
 
-  if (loading) return <AppSpinner />;
+  if (loading) return <AppSpinner text="Loading Tenants..." />;
   if (error) return <div className="text-danger">{error}</div>;
 
   return (

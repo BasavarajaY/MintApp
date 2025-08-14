@@ -17,6 +17,7 @@ const getSelectedProfileId = (): number | null => {
   }
   return null;
 };
+const profileId = getSelectedProfileId();
 
 export const requestOtp = async (payload: LoginPayload) => {
   const response = await otpInstance.post(`/web/auth/request-otp`, payload);
@@ -27,6 +28,9 @@ export const verifyOtp = async (payload: LoginPayload) => {
 };
 export const resendOtp = async (payload: LoginPayload) => {
   return otpInstance.post(`/web/auth/resend-otp`, payload);
+};
+export const fetchLoggedInUserData = () => {
+  return pageInstance.get(`/web/auth/me`);
 };
 export const fetchTenants = () => {
   return pageInstance.get(`/web/tenants/`);
@@ -69,7 +73,6 @@ export const deleteTenant = (tenantId: number) => {
 };
 
 export const fetchPackages = () => {
-  const profileId = getSelectedProfileId();
   return pageInstance.get(`/web/prepackaged-content/${profileId}`);
 };
 export const fetchPackageDetails = async (packageId: string) => {
@@ -84,11 +87,9 @@ export const migratePackages = async (payload: {
   }[];
   created_by: number;
 }) => {
-  const profileId = getSelectedProfileId();
   return pageInstance.post(`/web/variables/${profileId}`, payload);
 };
 export const fetchVariables = () => {
-  const profileId = getSelectedProfileId();
   return pageInstance.get(`/web/variables/${profileId}`);
 };
 export const createVariables = async (payload: {
@@ -102,7 +103,6 @@ export const createVariables = async (payload: {
   }[];
   created_by: number;
 }) => {
-  const profileId = getSelectedProfileId();
   return pageInstance.post(`/web/variables/${profileId}`, payload);
 };
 export const migrateVariables = async (payload: {
@@ -116,14 +116,12 @@ export const migrateVariables = async (payload: {
   }[];
   created_by: number;
 }) => {
-  const profileId = getSelectedProfileId();
   return pageInstance.post(`/web/variables/${profileId}`, payload);
 };
 export const fetchVariablesTaskStatus = async (taskId: string) => {
   return pageInstance.get(`/web/variables/status/${taskId}`);
 };
 export const fetchUserCredentials = () => {
-  const profileId = getSelectedProfileId();
   return pageInstance.get(`/web/user-credentials/${profileId}`);
 };
 export const migrateUserCreds = async (payload: {
@@ -138,14 +136,12 @@ export const migrateUserCreds = async (payload: {
   }[];
   created_by: number;
 }) => {
-  const profileId = getSelectedProfileId();
   return pageInstance.post(`/web/user-credentials/${profileId}`, payload);
 };
 export const fetchUserCredTaskStatus = async (taskId: string) => {
   return pageInstance.get(`/web/user-credentials/status/${taskId}`);
 };
 export const fetchOAuthCredentials = () => {
-  const profileId = getSelectedProfileId();
   return pageInstance.get(`/web/oauth2-credentials/${profileId}`);
 };
 export const migrateOAuthCreds = async (payload: {
@@ -160,14 +156,12 @@ export const migrateOAuthCreds = async (payload: {
   }[];
   created_by: number;
 }) => {
-  const profileId = getSelectedProfileId();
   return pageInstance.post(`/web/oauth2-credentials/${profileId}`, payload);
 };
 export const fetchOAuthCredTaskStatus = async (taskId: string) => {
   return pageInstance.get(`/web/oauth2-credentials/status/${taskId}`);
 };
 export const fetchNumberRanges = () => {
-  const profileId = getSelectedProfileId();
   return pageInstance.get(`/web/number-ranges/${profileId}`);
 };
 export const migrateNumberRanges = async (payload: {
@@ -185,14 +179,12 @@ export const migrateNumberRanges = async (payload: {
   }[];
   created_by: number;
 }) => {
-  const profileId = getSelectedProfileId();
   return pageInstance.post(`/web/number-ranges/${profileId}`, payload);
 };
 export const fetchNumberRangesTaskStatus = async (taskId: string) => {
   return pageInstance.get(`/web/number-ranges/status/${taskId}`);
 };
 export const fetchValueMappings = () => {
-  const profileId = getSelectedProfileId();
   return pageInstance.get(`/web/value-mappings/${profileId}`);
 };
 export const migrateValueMappings = async (payload: {
@@ -207,10 +199,47 @@ export const migrateValueMappings = async (payload: {
   }[];
   created_by: number;
 }) => {
-  const profileId = getSelectedProfileId();
   return pageInstance.post(`/web/value-mappings/${profileId}`, payload);
 };
 export const fetchValueMappingsTaskStatus = async (taskId: string) => {
   return pageInstance.get(`/web/value-mappings/status/${taskId}`);
+};
+export const fetchDataStores = () => {
+  return pageInstance.get(`/web/datastores/${profileId}`);
+};
+export const migrateDataStores = async (payload: {
+  module_type: string;
+  data: {
+    DataStoreName: string;
+    IntegrationFlow: string;
+    Type: string;
+    Visibility: string;
+    NumberOfMessages: string;
+    NumberOfOverdueMessages: string;
+  }[];
+  created_by: number;
+}) => {
+  return pageInstance.post(`/web/datastores/${profileId}`, payload);
+};
+export const fetchDataStoresTaskStatus = async (taskId: string) => {
+  return pageInstance.get(`/web/datastores/status/${taskId}`);
+};
+export const fetchPublicCerts = () => {
+  return pageInstance.get(`/web/datastores/${profileId}`);
+};
+export const migratePublicCerts = async (payload: {
+  module_type: string;
+  data: {
+    Hexalias: string;
+    Alias: string;
+    Type: string;
+    Owner: string;
+  }[];
+  created_by: number;
+}) => {
+  return pageInstance.post(`/web/datastores/${profileId}`, payload);
+};
+export const fetchPublicCertsTaskStatus = async (taskId: string) => {
+  return pageInstance.get(`/web/datastores/status/${taskId}`);
 };
 

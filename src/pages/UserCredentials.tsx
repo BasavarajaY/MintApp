@@ -64,7 +64,6 @@ const UserCredentials: React.FC = () => {
       try {
         const response = await fetchUserCredentials();
         const data = response.data?.result || [];
-        console.log(data);
         setUserCredData(data);
         setFilteredUsers(data);
       } catch (err) {
@@ -132,7 +131,7 @@ const UserCredentials: React.FC = () => {
   //   return <span style={{ color: "#003DA5", opacity: 0.3 }}>▲</span>; // Light faded arrow for inactive columns
   // };
 
-  if (loading) return <AppSpinner />;
+  if (loading) return <AppSpinner text="Loading User Credentials..." />;
   if (error) return <div className="text-danger">{error}</div>;
 
   return (

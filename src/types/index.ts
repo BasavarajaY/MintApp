@@ -64,4 +64,24 @@ export interface ValueMappingsItem {
   process_status?: string;
   progress_percentage?: number;
 }
+export interface DataStoresItem {
+  DataStoreName: string;
+  IntegrationFlow: string;
+  Type: string;
+  Visibility: string;
+  NumberOfMessages: string;
+  NumberOfOverdueMessages: string;
+  task_id?: string;
+  process_status?: string;
+  progress_percentage?: number;
+}
+export interface PublicCertsItem {
+  Hexalias: string;
+  Alias: string;
+  Type: string;
+  Owner: string;
+  task_id?: string;
+  process_status?: string;
+  progress_percentage?: number;
+}
 

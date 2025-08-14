@@ -1,22 +1,29 @@
 // src/components/Header.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import "./Header.css"; // we'll add this next
 import ProfSettingModal from "../pages/ProfSettingModal";
 import { useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface HeaderProps {
   showProfSettingModal: boolean;
   setShowProfSettingModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const storedUser = sessionStorage.getItem("loggedInUser");
+const userData = storedUser ? JSON.parse(storedUser) : null;
+
+// Extract initials from email first 2 letter before @ or use a default value "??"
+const initials = userData?.email
+  ? userData.email.split("@")[0].slice(0, 2).toUpperCase()
+  : "??";
+
 const Header: React.FC<HeaderProps> = ({
   showProfSettingModal,
   setShowProfSettingModal,
 }) => {
   const navigate = useNavigate();
-  // const [showProfSettingModal, setShowProfSettingModal] = useState(false);
 
   const location = useLocation();
   const currentPath = location.pathname;
@@ -28,9 +35,12 @@ const Header: React.FC<HeaderProps> = ({
   const isActiveItem = (path: string) => currentPath === path;
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    toast.success("Logged out successfully");
-    navigate("/");
+    sessionStorage.clear();
+    localStorage.clear();
+    toast.success("You have been logged out!");
+    setTimeout(() => {
+      navigate("/app");
+    }, 1000);
   };
 
   return (
@@ -69,6 +79,11 @@ const Header: React.FC<HeaderProps> = ({
                   "/app/dashboard/variables",
                   "/app/dashboard/packages",
                   "/app/dashboard/usercredentials",
+                  "/app/dashboard/oauthcredentials",
+                  "/app/dashboard/number-ranges",
+                  "/app/dashboard/value-mappings",
+                  "/app/dashboard/data-stores",
+                  "/app/dashboard/public-certificates",
                 ])
                   ? "active-top-menu"
                   : "text-white"
@@ -148,6 +163,30 @@ const Header: React.FC<HeaderProps> = ({
                   Value Mappings
                 </a>
               </li>
+              <li>
+                <a
+                  className={`dropdown-item fw-bold ${
+                    isActiveItem("/app/dashboard/data-stores")
+                      ? "active-menu"
+                      : ""
+                  }`}
+                  href="/app/dashboard/data-stores"
+                >
+                  Data Stores
+                </a>
+              </li>
+              <li>
+                <a
+                  className={`dropdown-item fw-bold ${
+                    isActiveItem("/app/dashboard/public-certificates")
+                      ? "active-menu"
+                      : ""
+                  }`}
+                  href="/app/dashboard/public-certificates"
+                >
+                  Public Certificates
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -208,7 +247,7 @@ const Header: React.FC<HeaderProps> = ({
                 height: "35px",
               }}
             >
-              YB
+              {initials}
             </div>
           </button>
 
@@ -229,11 +268,7 @@ const Header: React.FC<HeaderProps> = ({
               onClose={() => setShowProfSettingModal(false)}
             />
             <li>
-              <a
-                className="dropdown-item"
-                href="/settings"
-                onClick={handleLogout}
-              >
+              <a className="dropdown-item" href="#" onClick={handleLogout}>
                 <i className="bi bi-box-arrow-right me-2"></i> Logout
               </a>
             </li>

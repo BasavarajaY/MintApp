@@ -126,7 +126,7 @@ const Packages: React.FC = () => {
     return data;
   };
 
-  if (loading) return <AppSpinner />;
+  if (loading) return <AppSpinner text="Loading Packages..." />;
   if (error) return <div className="text-danger">{error}</div>;
 
   return (
@@ -203,13 +203,6 @@ const Packages: React.FC = () => {
                   <strong>{pkg.Name}</strong> (v{pkg.Version})
                 </div>
                 <span>{expandedIndex === index ? "▲" : "▼"}</span>
-                {/* <i
-                  className={`bi ${
-                    expandedIndex === index
-                      ? "bi-chevron-up"
-                      : "bi-chevron-down"
-                  }`}
-                ></i> */}
               </Card.Header>
 
               <Collapse in={expandedIndex === index}>

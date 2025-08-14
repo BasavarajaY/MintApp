@@ -42,7 +42,7 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
 
     if (!password) {
-      alert("Please enter the password from your email.");
+      alert("Please enter the OTP from your email.");
       return;
     }
 
@@ -134,7 +134,7 @@ const LoginForm: React.FC = () => {
           {otpRequested && (
             <div className="mb-3">
               <label htmlFor="password" className="form-label fw-bold">
-                Enter Password (from email)
+                Enter OTP (from email)
               </label>
               <input
                 type="password"
@@ -145,7 +145,7 @@ const LoginForm: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
               />
-              <div className="invalid-feedback">Password is required.</div>
+              <div className="invalid-feedback">OTP is required.</div>
             </div>
           )}
 

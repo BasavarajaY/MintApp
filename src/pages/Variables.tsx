@@ -146,14 +146,8 @@ const Variables: React.FC = () => {
     return `/Date(${timestamp})/`;
   };
 
-  if (loading) return <AppSpinner />;
+  if (loading) return <AppSpinner text="Loading Variables..." />;
   // // if (error) return <div className="text-danger">{error}</div>;
-  // <MessageDialog
-  //   show={showDialog}
-  //   onClose={() => setShowDialog(false)}
-  //   type="success"
-  //   message="Data saved successfully!"
-  // />;
 
   return (
     <div className="p-3">

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { fetchMintProfiles } from "../api/auth";
-import { useNavigate } from "react-router-dom";
 
 interface Profile {
   mint_profile_id?: number;
@@ -24,7 +23,6 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
   >(undefined);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (show) {
@@ -83,7 +81,9 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
     });
 
     onClose();
-    navigate("/app/dashboard/tenants", { replace: true });
+    // navigate("/app/dashboard/tenants", { replace: true });
+    // Redirect to tenants and reload
+    window.location.href = "/app/dashboard/tenants";
   };
 
   return (
