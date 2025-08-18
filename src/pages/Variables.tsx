@@ -19,8 +19,7 @@ import { useCommonTableState } from "../hooks/useCommonStates";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
 import { useMigration } from "../hooks/useMigration";
 import TableSortable from "../components/common/TableSortable";
-import MessageDialog from "../components/common/MessageDialogProps";
-import { useProfileState } from "../hooks/useProfileState";
+import ErrorState from "../components/common/ErrorState";
 
 const Variables: React.FC = () => {
   const {
@@ -37,17 +36,12 @@ const Variables: React.FC = () => {
     requestSort,
     sortConfig,
     selectedItems: selectedVars,
-    setSelectedItems: setSelectedVars,
     handleSelect,
     handleSelectAll,
     isMigrated,
     setIsMigrated,
   } = useCommonTableState<VariableItem>("VariableName");
   const [showModal, setShowModal] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
-  const { checkProfile } = useProfileState();
-  // const [dialogType, setDialogType] = useState<"success" | "error">("success");
-  // const [dialogMessage, setDialogMessage] = useState("");
 
   // ✅ Extract WebSocket handler and wrap it
   const { connectWebSocket: rawConnectWebSocket } =
@@ -73,15 +67,7 @@ const Variables: React.FC = () => {
   });
 
   useEffect(() => {
-    // Check if profile exists before API call
-    const init = async () => {
-      const hasProfile = await checkProfile();
-      if (hasProfile) {
-        await loadVariables();
-      }
-    };
-    init();
-    // loadVariables();
+    loadVariables();
   }, []);
 
   const loadVariables = async () => {
@@ -93,7 +79,6 @@ const Variables: React.FC = () => {
     } catch (err: any) {
       console.error("Error fetching variables:", err);
       setError("Failed to load variable data.");
-      setShowDialog(true);
     } finally {
       setLoading(false);
     }
@@ -113,15 +98,6 @@ const Variables: React.FC = () => {
       hour12: true,
     }).format(date);
   };
-
-  // Handle search filtering
-  useEffect(() => {
-    const filtered = variablesData.filter((v) =>
-      v.VariableName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredVars(filtered);
-    setSelectedVars([]); // Clear selections on search
-  }, [searchTerm, variablesData]);
 
   const handleAddVariable = async (variable: VariableItem) => {
     const payload = {
@@ -148,15 +124,17 @@ const Variables: React.FC = () => {
 
   if (loading) return <AppSpinner text="Loading Variables..." />;
   // // if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
-      <MessageDialog
-        show={showDialog}
-        onClose={() => setShowDialog(false)}
-        type={error ? "error" : "success"} // or however you determine type
-        message={error || "Data saved successfully!"}
-      />
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="mb-0" style={{ color: "#003DA5" }}>
           Variables
@@ -171,7 +149,7 @@ const Variables: React.FC = () => {
               border: "1px solid #003DA5",
               borderRadius: "5px",
               color: "#003DA5",
-              maxWidth: "240px",
+              width: "350px",
             }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

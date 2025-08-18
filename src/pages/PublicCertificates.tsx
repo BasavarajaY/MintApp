@@ -13,6 +13,8 @@ import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { PublicCertsItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
+import ErrorState from "../components/common/ErrorState";
+import PageHeader from "./PageHeader";
 
 const PublicCertificates: React.FC = () => {
   const {
@@ -29,7 +31,6 @@ const PublicCertificates: React.FC = () => {
     requestSort,
     sortConfig,
     selectedItems: selectedPublicCerts,
-    setSelectedItems: setSelectedPublicCerts,
     handleSelect,
     handleSelectAll,
     isMigrated,
@@ -67,7 +68,6 @@ const PublicCertificates: React.FC = () => {
         setPublicCertsData(data);
         setFilteredPublicCerts(data);
       } catch (err) {
-        console.error("Error fetching Public Certificates:", err);
         setError("Failed to load Public Certificates data.");
       } finally {
         setLoading(false);
@@ -77,75 +77,32 @@ const PublicCertificates: React.FC = () => {
     loadPublicCertificates();
   }, []);
 
-  useEffect(() => {
-    let filtered = publicCertsData.filter((v) =>
-      v.Alias.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (sortConfig) {
-      const key: keyof PublicCertsItem = sortConfig.key;
-      const direction = sortConfig.direction;
-
-      filtered = [...filtered].sort((a, b) => {
-        if ((a[key] ?? "") < (b[key] ?? "")) {
-          return direction === "asc" ? -1 : 1;
-        }
-        if ((a[key] ?? "") > (b[key] ?? "")) {
-          return direction === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    setFilteredPublicCerts(filtered);
-
-    setSelectedPublicCerts((prevSelected) =>
-      prevSelected.filter((name) =>
-        filtered.some((item) => item.Alias === name)
-      )
-    );
-  }, [searchTerm, publicCertsData, sortConfig]);
-
   if (loading) return <AppSpinner text="Loading Public Certificates..." />;
-  if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="mb-0" style={{ color: "#003DA5" }}>
-          Custom Public Certificates
-        </h4>
-        <div className="d-flex gap-2 align-items-center">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="form-control"
-            style={{
-              border: "1px solid #003DA5",
-              borderRadius: "5px",
-              color: "#003DA5",
-              maxWidth: "240px",
-            }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            className="btn btn-outline-success fw-bold"
-            onClick={() => {
-              handleMigrate(
-                selectedPublicCerts,
-                publicCertsData,
-                migratePublicCerts
-              );
-            }}
-            disabled={selectedPublicCerts.length === 0}
-            data-bs-toggle="tooltip"
-            title="Migrate selected Public Certificates"
-          >
-            <i className="bi bi-cloud-upload me-1"></i>
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Custom Public Certificates"
+        searchPlaceholder="Search..."
+        searchTerm={searchTerm}
+        setSearchTerm={(val) => setSearchTerm(val)}
+        onMigrate={() =>
+          handleMigrate(
+            selectedPublicCerts,
+            publicCertsData,
+            migratePublicCerts
+          )
+        }
+        disableMigrate={selectedPublicCerts.length === 0}
+      />
       <ProfileBanner />
 
       <div

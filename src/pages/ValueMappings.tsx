@@ -13,6 +13,8 @@ import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { ValueMappingsItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
+import ErrorState from "../components/common/ErrorState";
+import PageHeader from "./PageHeader";
 
 const ValueMappings: React.FC = () => {
   const {
@@ -29,7 +31,6 @@ const ValueMappings: React.FC = () => {
     requestSort,
     sortConfig,
     selectedItems: selectedValMaps,
-    setSelectedItems: setSelectedValMaps,
     handleSelect,
     handleSelectAll,
     isMigrated,
@@ -68,7 +69,6 @@ const ValueMappings: React.FC = () => {
         setValueMappingsData(data);
         setFilteredValMaps(data);
       } catch (err) {
-        console.error("Error fetching Value Mappings:", err);
         setError("Failed to load Value Mappings data.");
       } finally {
         setLoading(false);
@@ -78,71 +78,29 @@ const ValueMappings: React.FC = () => {
     loadOAuthCreds();
   }, []);
 
-  useEffect(() => {
-    let filtered = ValMapsData.filter((v) =>
-      v.Name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // Apply sorting if active
-    if (sortConfig) {
-      const key: keyof ValueMappingsItem = sortConfig.key;
-      const direction = sortConfig.direction;
-
-      filtered = [...filtered].sort((a, b) => {
-        if ((a[key] ?? "") < (b[key] ?? "")) {
-          return direction === "asc" ? -1 : 1;
-        }
-        if ((a[key] ?? "") > (b[key] ?? "")) {
-          return direction === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    setFilteredValMaps(filtered);
-
-    // Keep only selected users still in the filtered list
-    setSelectedValMaps((prevSelected) =>
-      prevSelected.filter((name) => filtered.some((item) => item.Name === name))
-    );
-  }, [searchTerm, ValMapsData, sortConfig]);
-
   if (loading) return <AppSpinner text="Loading Value Mappings..." />;
-  if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="mb-0" style={{ color: "#003DA5" }}>
-          Value Mappings
-        </h4>
-        <div className="d-flex gap-2 align-items-center">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="form-control"
-            style={{
-              border: "1px solid #003DA5",
-              borderRadius: "5px",
-              color: "#003DA5",
-              maxWidth: "240px",
-            }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            className="btn btn-outline-success fw-bold"
-            onClick={() => {
-              handleMigrate(selectedValMaps, ValMapsData, migrateValueMappings);
-            }}
-            disabled={selectedValMaps.length === 0}
-            data-bs-toggle="tooltip"
-            title="Migrate selected Value Mappings"
-          >
-            <i className="bi bi-cloud-upload me-1"></i>
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Value Mappings"
+        searchPlaceholder="Search..."
+        searchTerm={searchTerm}
+        setSearchTerm={(val) => setSearchTerm(val)}
+        onMigrate={() =>
+          handleMigrate(selectedValMaps, ValMapsData, migrateValueMappings)
+        }
+        disableMigrate={selectedValMaps.length === 0}
+      />
+
       <ProfileBanner />
 
       <div

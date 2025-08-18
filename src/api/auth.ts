@@ -1,3 +1,4 @@
+// src/api/auth.ts
 import { otpInstance } from './axiosInstance';
 import { pageInstance } from './axiosInstance';
 
@@ -87,7 +88,10 @@ export const migratePackages = async (payload: {
   }[];
   created_by: number;
 }) => {
-  return pageInstance.post(`/web/variables/${profileId}`, payload);
+  return pageInstance.post(`/web/prepackaged-content/${profileId}`, payload);
+};
+export const fetchPackagesTaskStatus = async (taskId: string) => {
+  return pageInstance.get(`/web/prepackaged-content/status/${taskId}`);
 };
 export const fetchVariables = () => {
   return pageInstance.get(`/web/variables/${profileId}`);
@@ -241,5 +245,22 @@ export const migratePublicCerts = async (payload: {
 };
 export const fetchPublicCertsTaskStatus = async (taskId: string) => {
   return pageInstance.get(`/web/datastores/status/${taskId}`);
+};
+export const fetchAccessPols = () => {
+  return pageInstance.get(`/web/access-policies/${profileId}`);
+};
+export const migrateAccessPols = async (payload: {
+  module_type: string;
+  data: {
+    Id: string;
+    RoleName: string;
+    Description: string;
+  }[];
+  created_by: number;
+}) => {
+  return pageInstance.post(`/web/access-policies/${profileId}`, payload);
+};
+export const fetchAccessPolsTaskStatus = async (taskId: string) => {
+  return pageInstance.get(`/web/access-policies/status/${taskId}`);
 };
 

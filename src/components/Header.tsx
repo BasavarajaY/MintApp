@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({
     localStorage.clear();
     toast.success("You have been logged out!");
     setTimeout(() => {
-      navigate("/app");
+      navigate("/app/");
     }, 1000);
   };
 
@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({
       <div className="d-flex align-items-center gap-5">
         {/* Menus */}
         <div className="d-flex align-items-center gap-4">
-          {/* Dashboard (non-clickable) */}
+          {/* Dashboard */}
           <div className="dropdown hover-dropdown">
             <span
               className={`fw-semibold ${
@@ -84,6 +84,7 @@ const Header: React.FC<HeaderProps> = ({
                   "/app/dashboard/value-mappings",
                   "/app/dashboard/data-stores",
                   "/app/dashboard/public-certificates",
+                  "/app/dashboard/access-policies",
                 ])
                   ? "active-top-menu"
                   : "text-white"
@@ -93,100 +94,46 @@ const Header: React.FC<HeaderProps> = ({
               Migration View
             </span>
             <ul className="dropdown-menu">
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/variables")
-                      ? "active-menu"
-                      : ""
-                  }`}
-                  href="/app/dashboard/variables"
-                >
-                  Variables
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/packages") ? "active-menu" : ""
-                  }`}
-                  href="/app/dashboard/packages"
-                >
-                  Packages
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/usercredentials")
-                      ? "active-menu"
-                      : ""
-                  }`}
-                  href="/app/dashboard/usercredentials"
-                >
-                  User Credintials
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/oauthcredentials")
-                      ? "active-menu"
-                      : ""
-                  }`}
-                  href="/app/dashboard/oauthcredentials"
-                >
-                  OAuth Credintials
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/number-ranges")
-                      ? "active-menu"
-                      : ""
-                  }`}
-                  href="/app/dashboard/number-ranges"
-                >
-                  Number Ranges
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/value-mappings")
-                      ? "active-menu"
-                      : ""
-                  }`}
-                  href="/app/dashboard/value-mappings"
-                >
-                  Value Mappings
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/data-stores")
-                      ? "active-menu"
-                      : ""
-                  }`}
-                  href="/app/dashboard/data-stores"
-                >
-                  Data Stores
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/public-certificates")
-                      ? "active-menu"
-                      : ""
-                  }`}
-                  href="/app/dashboard/public-certificates"
-                >
-                  Public Certificates
-                </a>
-              </li>
+              {[
+                { path: "/app/dashboard/variables", label: "Variables" },
+                { path: "/app/dashboard/packages", label: "Packages" },
+                {
+                  path: "/app/dashboard/usercredentials",
+                  label: "User Credentials",
+                },
+                {
+                  path: "/app/dashboard/oauthcredentials",
+                  label: "OAuth Credentials",
+                },
+                {
+                  path: "/app/dashboard/number-ranges",
+                  label: "Number Ranges",
+                },
+                {
+                  path: "/app/dashboard/value-mappings",
+                  label: "Value Mappings",
+                },
+                { path: "/app/dashboard/data-stores", label: "Data Stores" },
+                {
+                  path: "/app/dashboard/public-certificates",
+                  label: "Public Certificates",
+                },
+                {
+                  path: "/app/dashboard/access-policies",
+                  label: "Access Policies",
+                },
+              ].map((item) => (
+                <li key={item.path}>
+                  <a
+                    href={item.path}
+                    className={`dropdown-item ${
+                      isActiveItem(item.path) ? "active" : ""
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -206,26 +153,21 @@ const Header: React.FC<HeaderProps> = ({
               Master Config
             </span>
             <ul className="dropdown-menu">
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/tenants") ? "active-menu" : ""
-                  }`}
-                  href="/app/dashboard/tenants"
-                >
-                  Tenants
-                </a>
-              </li>
-              <li>
-                <a
-                  className={`dropdown-item fw-bold ${
-                    isActiveItem("/app/dashboard/profiles") ? "active-menu" : ""
-                  }`}
-                  href="/app/dashboard/profiles"
-                >
-                  Profiles
-                </a>
-              </li>
+              {[
+                { path: "/app/dashboard/tenants", label: "Tenants" },
+                { path: "/app/dashboard/profiles", label: "Profiles" },
+              ].map((item) => (
+                <li key={item.path}>
+                  <a
+                    href={item.path}
+                    className={`dropdown-item ${
+                      isActiveItem(item.path) ? "active" : ""
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

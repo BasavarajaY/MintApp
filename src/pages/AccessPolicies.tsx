@@ -1,8 +1,8 @@
 import { useEffect, useCallback } from "react";
 import {
-  fetchOAuthCredentials,
-  fetchOAuthCredTaskStatus,
-  migrateOAuthCreds,
+  fetchAccessPols,
+  fetchAccessPolsTaskStatus,
+  migrateAccessPols,
 } from "../api/auth";
 import AppSpinner from "../components/common/AppSpinner";
 import ProfileBanner from "./ProfileBanner";
@@ -10,18 +10,18 @@ import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
 import StatusProgressBar from "../components/common/StatusProgressBar";
-import type { OAuthCredItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
+import type { AccessPolsItem } from "../types";
 
-const OAuthCredentials: React.FC = () => {
+const AccessPolicies: React.FC = () => {
   const {
-    data: oAuthCredData,
-    setData: setOAuthCredData,
-    filteredData: filteredUsers,
-    setFilteredData: setFilteredUsers,
+    data: accessPolsData,
+    setData: setAccessPolsData,
+    filteredData: filteredAccessPols,
+    setFilteredData: setFilteredAccessPols,
     loading,
     setLoading,
     error,
@@ -30,19 +30,19 @@ const OAuthCredentials: React.FC = () => {
     setSearchTerm,
     requestSort,
     sortConfig,
-    selectedItems: selectedUsers,
+    selectedItems: selectedAccessPols,
     handleSelect,
     handleSelectAll,
     isMigrated,
     setIsMigrated,
-  } = useCommonTableState<OAuthCredItem>("Name");
+  } = useCommonTableState<AccessPolsItem>("RoleName");
 
   // ✅ Extract WebSocket handler and wrap it
   const { connectWebSocket: rawConnectWebSocket } =
-    useWebSocketManager<OAuthCredItem>(
-      setOAuthCredData,
-      setFilteredUsers,
-      fetchOAuthCredTaskStatus
+    useWebSocketManager<AccessPolsItem>(
+      setAccessPolsData,
+      setFilteredAccessPols,
+      fetchAccessPolsTaskStatus
     );
 
   const connectWebSocket = useCallback(
@@ -51,34 +51,33 @@ const OAuthCredentials: React.FC = () => {
   );
 
   // ✅ useMigration hook
-  const { handleMigrate } = useMigration<OAuthCredItem, "Name">({
-    moduleType: "oauth2-credentials",
-    setData: setOAuthCredData,
-    setFilteredData: setFilteredUsers,
+  const { handleMigrate } = useMigration<AccessPolsItem, "RoleName">({
+    moduleType: "access-policies",
+    setData: setAccessPolsData,
+    setFilteredData: setFilteredAccessPols,
     connectWebSocket,
     setIsMigrated,
-    matchKey: "Name",
+    matchKey: "RoleName",
   });
 
   useEffect(() => {
-    const loadOAuthCreds = async () => {
+    const loadAccessPols = async () => {
       try {
-        const response = await fetchOAuthCredentials();
+        const response = await fetchAccessPols();
         const data = response.data?.results || [];
-        console.log(data);
-        setOAuthCredData(data);
-        setFilteredUsers(data);
+        setAccessPolsData(data);
+        setFilteredAccessPols(data);
       } catch (err) {
-        setError("Failed to load OAuth Credentials data.");
+        setError("Failed to load Access Policies data.");
       } finally {
         setLoading(false);
       }
     };
 
-    loadOAuthCreds();
+    loadAccessPols();
   }, []);
 
-  if (loading) return <AppSpinner text="Loading OAuth Credentials..." />;
+  if (loading) return <AppSpinner text="Loading Access Policies..." />;
   if (error) {
     return (
       <ErrorState
@@ -91,14 +90,14 @@ const OAuthCredentials: React.FC = () => {
   return (
     <div className="p-3">
       <PageHeader
-        title="OAuth Credentials"
+        title="Access Policies"
         searchPlaceholder="Search..."
         searchTerm={searchTerm}
         setSearchTerm={(val) => setSearchTerm(val)}
         onMigrate={() =>
-          handleMigrate(selectedUsers, oAuthCredData, migrateOAuthCreds)
+          handleMigrate(selectedAccessPols, accessPolsData, migrateAccessPols)
         }
-        disableMigrate={selectedUsers.length === 0}
+        disableMigrate={selectedAccessPols.length === 0}
       />
       <ProfileBanner />
 
@@ -119,84 +118,77 @@ const OAuthCredentials: React.FC = () => {
                   <Form.Check
                     type="checkbox"
                     checked={
-                      filteredUsers.length > 0 &&
-                      selectedUsers.length === filteredUsers.length
+                      filteredAccessPols.length > 0 &&
+                      selectedAccessPols.length === filteredAccessPols.length
                     }
                     onChange={(e) =>
                       handleSelectAll(
-                        filteredUsers.map((u) => u.Name),
+                        filteredAccessPols.map((u) => u.RoleName),
                         e.target.checked
                       )
                     }
                   />
                 </th>
-                <TableSortable<OAuthCredItem>
-                  columnKey="Name"
-                  label="Name"
+                <TableSortable<AccessPolsItem>
+                  columnKey="Id"
+                  label="Id"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <TableSortable<OAuthCredItem>
-                  columnKey="Description"
-                  label="Description"
+                <TableSortable<AccessPolsItem>
+                  columnKey="RoleName"
+                  label="Role Name"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <TableSortable<OAuthCredItem>
-                  columnKey="TokenServiceUrl"
-                  label="Token Service URL"
-                  sortConfig={sortConfig}
-                  requestSort={requestSort}
-                />
-                <TableSortable<OAuthCredItem>
-                  columnKey="ClientId"
-                  label="Client ID"
-                  sortConfig={sortConfig}
-                  requestSort={requestSort}
-                />
+                <th className="py-2 px-3">Description</th>
                 {isMigrated && <th className="py-2 px-3">Status</th>}
                 {isMigrated && <th className="py-2 px-3">Progress</th>}
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.length === 0 ? (
+              {filteredAccessPols.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center text-muted py-3">
-                    No OAuth Credentials records found.
+                    No Access Policies records found.
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((user) => (
-                  <tr key={user.Name}>
+                filteredAccessPols.map((accesspol) => (
+                  <tr key={accesspol.RoleName}>
                     <td className="py-2 px-3">
                       <Form.Check
                         type="checkbox"
-                        checked={selectedUsers.includes(user.Name)}
+                        checked={selectedAccessPols.includes(
+                          accesspol.RoleName
+                        )}
                         onChange={(e) =>
-                          handleSelect(user.Name, e.target.checked)
+                          handleSelect(accesspol.RoleName, e.target.checked)
                         }
                       />
                     </td>
-                    <td className="py-2 px-3">{user.Name || "—"}</td>
-                    <td className="py-2 px-3">{user.Description || "—"}</td>
-                    <td className="py-2 px-3">{user.TokenServiceUrl || "—"}</td>
-                    <td className="py-2 px-3">{user.ClientId || "—"}</td>
+                    <td className="py-2 px-3">{accesspol.Id || "—"}</td>
+                    <td className="py-2 px-3">{accesspol.RoleName || "—"}</td>
+                    <td className="py-2 px-3">
+                      {accesspol.Description || "—"}
+                    </td>
+
                     {isMigrated && (
                       <>
                         <td className="py-2 px-3 text-capitalize">
-                          {user.process_status ? (
+                          {accesspol.process_status ? (
                             <span
                               className={`badge ${
-                                user.process_status === "success"
+                                accesspol.process_status === "success"
                                   ? "bg-success"
-                                  : user.process_status === "pending"
+                                  : accesspol.process_status === "pending"
                                   ? "bg-warning text-dark"
-                                  : user.process_status === "failed"
+                                  : accesspol.process_status === "failed"
                                   ? "bg-danger"
                                   : "bg-secondary"
                               }`}
                             >
-                              {user.process_status.replace(/_/g, " ")}
+                              {accesspol.process_status.replace(/_/g, " ")}
                             </span>
                           ) : (
                             "—"
@@ -205,8 +197,8 @@ const OAuthCredentials: React.FC = () => {
                         <td className="py-2 px-3">
                           <div style={{ marginTop: "6px" }}>
                             <StatusProgressBar
-                              percentage={user.progress_percentage}
-                              status={user.process_status}
+                              percentage={accesspol.progress_percentage}
+                              status={accesspol.process_status}
                             />
                           </div>
                         </td>
@@ -223,4 +215,4 @@ const OAuthCredentials: React.FC = () => {
   );
 };
 
-export default OAuthCredentials;
+export default AccessPolicies;

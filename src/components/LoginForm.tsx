@@ -26,8 +26,7 @@ const LoginForm: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await requestOtp({ email });
-      console.log("OTP requested:", response);
+      await requestOtp({ email });
       setOtpRequested(true);
       toast.success("OTP has been sent. Please check your email.");
     } catch (error) {

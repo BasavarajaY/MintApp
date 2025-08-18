@@ -19,20 +19,28 @@ const ProfileBanner: React.FC = () => {
 
   return (
     <div
-      className="alert alert-info p-3 mb-3 d-flex justify-content-between align-items-center"
-      style={{ borderLeft: "6px solid #003DA5" }}
+      className="card shadow-sm mb-3 border-0"
+      style={{
+        borderLeft: "6px solid #003DA5",
+        background: "linear-gradient(120deg, #e3f0fc 0%, #f5f8fa 100%)",
+      }}
     >
-      <div>
-        <strong style={{ color: "#003DA5" }}>Profile:</strong>{" "}
-        <strong>{name}</strong>
-      </div>
-      <div>
-        <strong style={{ color: "#003DA5" }}>Source:</strong>{" "}
-        <strong>{source}</strong>
-      </div>
-      <div>
-        <strong style={{ color: "#003DA5" }}>Destination:</strong>{" "}
-        <strong>{destination}</strong>
+      <div
+        className="alert alert-info d-flex justify-content-between align-items-center rounded shadow-sm mb-1"
+        style={{ borderLeft: "6px solid #003DA5" }}
+      >
+        <div>
+          <span className="fw-bold text-primary">Profile:</span>{" "}
+          <span className="fw-semibold">{name}</span>
+        </div>
+        <div>
+          <span className="fw-bold text-primary">Source:</span>{" "}
+          <span className="fw-semibold">{source}</span>
+        </div>
+        <div>
+          <span className="fw-bold text-primary">Destination:</span>{" "}
+          <span className="fw-semibold">{destination}</span>
+        </div>
       </div>
     </div>
   );

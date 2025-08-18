@@ -1,5 +1,4 @@
-/* src/components/common/AppSpinner.css */
-
+/* Modern App Spinner */
 .app-spinner-wrapper {
     display: flex;
     flex-direction: column;
@@ -8,7 +7,6 @@
     padding: 2rem;
 }
 
-/* Full screen mode */
 .app-spinner-wrapper.fullscreen {
     position: fixed;
     top: 0;
@@ -19,20 +17,27 @@
     z-index: 9999;
 }
 
-/* The actual spinner */
+/* Dual Ring Spinner */
 .app-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid #003DA5;
-    /* Green border */
-    border-top: 4px solid #d1e7dd;
-    /* Light green (card color) */
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    display: inline-block;
+    width: 56px;
+    height: 56px;
+    position: relative;
 }
 
-/* Spinner animation */
-@keyframes spin {
+.app-spinner:after {
+    content: " ";
+    display: block;
+    width: 48px;
+    height: 48px;
+    margin: 4px;
+    border-radius: 50%;
+    border: 4px solid #e3f0fc;
+    border-color: #e3f0fc transparent #003DA5 transparent;
+    animation: app-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes app-spin {
     0% {
         transform: rotate(0deg);
     }
@@ -44,9 +49,12 @@
 
 /* Animated Loading Text */
 .loading-text {
-    margin-top: 10px;
-    font-size: 16px;
+    margin-top: 14px;
+    font-size: 17px;
     color: #003DA5;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     animation: pulse 1.5s ease-in-out infinite;
 }
 

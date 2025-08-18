@@ -13,6 +13,8 @@ import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { UserCredItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
+import ErrorState from "../components/common/ErrorState";
+import PageHeader from "./PageHeader";
 
 const UserCredentials: React.FC = () => {
   const {
@@ -29,7 +31,6 @@ const UserCredentials: React.FC = () => {
     requestSort,
     sortConfig,
     selectedItems: selectedUsers,
-    setSelectedItems: setSelectedUsers,
     handleSelect,
     handleSelectAll,
     isMigrated,
@@ -67,7 +68,6 @@ const UserCredentials: React.FC = () => {
         setUserCredData(data);
         setFilteredUsers(data);
       } catch (err) {
-        console.error("Error fetching User Credentials:", err);
         setError("Failed to load User Credentials data.");
       } finally {
         setLoading(false);
@@ -77,96 +77,29 @@ const UserCredentials: React.FC = () => {
     loadUserCreds();
   }, []);
 
-  useEffect(() => {
-    let filtered = userCredData.filter((v) =>
-      v.Name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // Apply sorting if active
-    if (sortConfig) {
-      const key: keyof UserCredItem = sortConfig.key;
-      const direction = sortConfig.direction;
-
-      filtered = [...filtered].sort((a, b) => {
-        if ((a[key] ?? "") < (b[key] ?? "")) {
-          return direction === "asc" ? -1 : 1;
-        }
-        if ((a[key] ?? "") > (b[key] ?? "")) {
-          return direction === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    setFilteredUsers(filtered);
-
-    // Keep only selected users still in the filtered list
-    setSelectedUsers((prevSelected) =>
-      prevSelected.filter((name) => filtered.some((item) => item.Name === name))
-    );
-  }, [searchTerm, userCredData, sortConfig]);
-
-  // // Handle sort request
-  // const requestSort = (key: keyof UserCredItem) => {
-  //   let direction: "asc" | "desc" = "asc";
-  //   if (
-  //     sortConfig &&
-  //     sortConfig.key === key &&
-  //     sortConfig.direction === "asc"
-  //   ) {
-  //     direction = "desc";
-  //   }
-  //   setSortConfig({ key, direction });
-  // };
-
-  // // Sort arrow indicator
-  // const getSortArrow = (key: keyof UserCredItem) => {
-  //   if (sortConfig?.key === key) {
-  //     return (
-  //       <span style={{ color: "#003DA5" }}>
-  //         {sortConfig.direction === "asc" ? " ▲" : " ▼"}
-  //       </span>
-  //     );
-  //   }
-  //   return <span style={{ color: "#003DA5", opacity: 0.3 }}>▲</span>; // Light faded arrow for inactive columns
-  // };
-
   if (loading) return <AppSpinner text="Loading User Credentials..." />;
-  if (error) return <div className="text-danger">{error}</div>;
+  // if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="mb-0" style={{ color: "#003DA5" }}>
-          User Credentials
-        </h4>
-        <div className="d-flex gap-2 align-items-center">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="form-control"
-            style={{
-              border: "1px solid #003DA5",
-              borderRadius: "5px",
-              color: "#003DA5",
-              maxWidth: "240px",
-            }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            className="btn btn-outline-success fw-bold"
-            onClick={() => {
-              handleMigrate(selectedUsers, userCredData, migrateUserCreds);
-            }}
-            disabled={selectedUsers.length === 0}
-            data-bs-toggle="tooltip"
-            title="Migrate selected users"
-          >
-            <i className="bi bi-cloud-upload me-1"></i>
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="User Credentials"
+        searchPlaceholder="Search..."
+        searchTerm={searchTerm}
+        setSearchTerm={(val) => setSearchTerm(val)}
+        onMigrate={() =>
+          handleMigrate(selectedUsers, userCredData, migrateUserCreds)
+        }
+        disableMigrate={selectedUsers.length === 0}
+      />
       <ProfileBanner />
 
       <div
@@ -197,19 +130,6 @@ const UserCredentials: React.FC = () => {
                     }
                   />
                 </th>
-                {/* <th
-                  onClick={() => requestSort("Name")}
-                  style={{ cursor: "pointer" }}
-                >
-                  Name{" "}
-                  <span style={{ color: "#003DA5" }}>
-                    {sortConfig?.key === "Name"
-                      ? sortConfig.direction === "asc"
-                        ? "▲"
-                        : "▼"
-                      : "▲"}{" "}
-                  </span>
-                </th> */}
                 <TableSortable<UserCredItem>
                   columnKey="Name"
                   label="Name"
@@ -264,6 +184,13 @@ const UserCredentials: React.FC = () => {
                     <td className="py-2 px-3">{user.User || "—"}</td>
                     <td className="py-2 px-3">{user.CompanyId || "—"}</td>
                     {isMigrated && (
+                      // <StatusCell
+                      //   processStatus={user.process_status}
+                      //   progressPercentage={user.progress_percentage}
+                      //   successMessage={user.success_message}
+                      //   errorMessage={user.error_message}
+                      //   showProgress={selectedUsers.includes(user.Name)}
+                      // />
                       <>
                         <td className="py-2 px-3 text-capitalize">
                           {user.process_status ? (

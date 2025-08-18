@@ -16,6 +16,8 @@ export interface VariableItem {
   task_id?: string;
   process_status?: string;
   progress_percentage?: number;
+  success_message?: string;
+  error_message?: string;
 }
 export interface UserCredItem {
   Name: string;
@@ -27,6 +29,8 @@ export interface UserCredItem {
   task_id?: string;
   process_status?: string;
   progress_percentage?: number;
+  success_message?: string;
+  error_message?: string;
 }
 export interface OAuthCredItem {
   Name: string;
@@ -80,6 +84,14 @@ export interface PublicCertsItem {
   Alias: string;
   Type: string;
   Owner: string;
+  task_id?: string;
+  process_status?: string;
+  progress_percentage?: number;
+}
+export interface AccessPolsItem {
+  Id: string;
+  RoleName: string;
+  Description: string;
   task_id?: string;
   process_status?: string;
   progress_percentage?: number;

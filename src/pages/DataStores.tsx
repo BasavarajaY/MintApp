@@ -13,6 +13,8 @@ import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { DataStoresItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
+import ErrorState from "../components/common/ErrorState";
+import PageHeader from "./PageHeader";
 
 const DataStores: React.FC = () => {
   const {
@@ -29,7 +31,6 @@ const DataStores: React.FC = () => {
     requestSort,
     sortConfig,
     selectedItems: selectedDataStores,
-    setSelectedItems: setSelectedDataStores,
     handleSelect,
     handleSelectAll,
     isMigrated,
@@ -67,7 +68,6 @@ const DataStores: React.FC = () => {
         setDataStoresData(data);
         setFilteredDataStores(data);
       } catch (err) {
-        console.error("Error fetching DataStores:", err);
         setError("Failed to load DataStores data.");
       } finally {
         setLoading(false);
@@ -77,76 +77,28 @@ const DataStores: React.FC = () => {
     loadDataStores();
   }, []);
 
-  useEffect(() => {
-    let filtered = dataStoresData.filter((v) =>
-      v.DataStoreName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // Apply sorting if active
-    if (sortConfig) {
-      const key: keyof DataStoresItem = sortConfig.key;
-      const direction = sortConfig.direction;
-
-      filtered = [...filtered].sort((a, b) => {
-        if ((a[key] ?? "") < (b[key] ?? "")) {
-          return direction === "asc" ? -1 : 1;
-        }
-        if ((a[key] ?? "") > (b[key] ?? "")) {
-          return direction === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    setFilteredDataStores(filtered);
-
-    setSelectedDataStores((prevSelected) =>
-      prevSelected.filter((name) =>
-        filtered.some((item) => item.DataStoreName === name)
-      )
-    );
-  }, [searchTerm, dataStoresData, sortConfig]);
-
   if (loading) return <AppSpinner text="Loading Data Stores..." />;
-  if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="mb-0" style={{ color: "#003DA5" }}>
-          Data Stores
-        </h4>
-        <div className="d-flex gap-2 align-items-center">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="form-control"
-            style={{
-              border: "1px solid #003DA5",
-              borderRadius: "5px",
-              color: "#003DA5",
-              maxWidth: "240px",
-            }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            className="btn btn-outline-success fw-bold"
-            onClick={() => {
-              handleMigrate(
-                selectedDataStores,
-                dataStoresData,
-                migrateDataStores
-              );
-            }}
-            disabled={selectedDataStores.length === 0}
-            data-bs-toggle="tooltip"
-            title="Migrate selected Data Stores"
-          >
-            <i className="bi bi-cloud-upload me-1"></i>
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Data Stores"
+        searchPlaceholder="Search..."
+        searchTerm={searchTerm}
+        setSearchTerm={(val) => setSearchTerm(val)}
+        onMigrate={() =>
+          handleMigrate(selectedDataStores, dataStoresData, migrateDataStores)
+        }
+        disableMigrate={selectedDataStores.length === 0}
+      />
       <ProfileBanner />
 
       <div

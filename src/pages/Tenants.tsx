@@ -10,6 +10,7 @@ import {
 import AddTenantModal from "./TenantModal";
 import toast from "react-hot-toast";
 import AppSpinner from "../components/common/AppSpinner";
+import ErrorState from "../components/common/ErrorState";
 
 const Tenants: React.FC = () => {
   const [tenantsData, setTenantsData] = useState<any[]>([]);
@@ -28,7 +29,6 @@ const Tenants: React.FC = () => {
         setTenantsData(data.tenants);
         setFilteredData(data.tenants);
       } catch (err: any) {
-        console.error("Error fetching tenant:", err);
         setError("Failed to load tenant data.");
       } finally {
         setLoading(false);
@@ -127,7 +127,14 @@ const Tenants: React.FC = () => {
   };
 
   if (loading) return <AppSpinner text="Loading Tenants..." />;
-  if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
@@ -144,7 +151,7 @@ const Tenants: React.FC = () => {
               border: "1px solid #003DA5",
               borderRadius: "5px",
               color: "#003DA5",
-              maxWidth: "240px",
+              width: "350px",
             }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

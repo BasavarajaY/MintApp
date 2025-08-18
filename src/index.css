@@ -1,14 +1,200 @@
-/* Only applies when table has this class */
-.table-appblue th,
-.table-appblue td {
-    color: #003DA5 !important;
+/* Modern Variables Table Styling */
+.table-appblue {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: linear-gradient(120deg, #f5f8fa 0%, #fff 100%);
+    box-shadow: 0 4px 24px rgba(0, 61, 165, 0.08), 0 1.5px 4px rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+    overflow: auto;
+    margin-bottom: 32px;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    letter-spacing: 0.01em;
+    margin-bottom: 0;
 }
 
-.sticky-table thead th {
+/* Table header: sticky, deep blue, white text, shadow */
+.table-appblue th {
+    background: #6698f0;
+    color: #fff !important;
+    font-weight: 600;
     position: sticky;
     top: 0;
-    background: white;
     z-index: 2;
+    border-bottom: 2px solid #dbeafe;
+    text-align: left;
+    letter-spacing: 0.03em;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0, 61, 165, 0.08);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Table cells */
+.table-appblue td {
+    color: #003DA5 !important;
+    padding: 13px 16px;
+    font-size: 15px;
+    border-bottom: 1px solid #eaeaea;
+    background: #fff;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* Table row hover effect */
+.table-appblue tbody tr:hover {
+    background: #eaf4ff;
+    box-shadow: 0 2px 8px rgba(0, 61, 165, 0.05);
+}
+
+/* Sorter button/icon styling for visibility */
+.table-appblue .sorter-btn {
+    color: #FFD700 !important;
+    margin-left: 6px;
+    font-size: 16px;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.table-appblue .sorter-btn:hover {
+    color: #fff200 !important;
+}
+
+/* Badge styling */
+.table-appblue td .badge {
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    box-shadow: 0 1px 4px rgba(0, 61, 165, 0.08);
+}
+
+/* Checkbox styling */
+.table-appblue td .form-check-input {
+    margin-top: 0;
+    accent-color: #003DA5;
+    width: 18px;
+    height: 18px;
+}
+
+.table-appblue td.text-muted {
+    color: #6c757d !important;
+}
+
+.table-appblue td.text-center {
+    text-align: center;
+}
+
+.table-appblue td.text-capitalize {
+    text-transform: capitalize;
+}
+
+/* Reduce spacing for checkbox column */
+.table-appblue td:first-child {
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 40px;
+}
+
+.table-appblue td .form-check-input {
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Compact the first column (checkbox column) */
+.table-appblue th:first-child,
+.table-appblue td:first-child {
+    width: 45px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+}
+
+/* Force checkbox alignment */
+.table-appblue .form-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    /* remove default margin */
+}
+
+.table-appblue .form-check-input {
+    margin: 0;
+    /* kill bootstrap offset */
+    position: relative;
+    top: 0;
+}
+
+/* Align all checkboxes in header + rows */
+.table-appblue th .form-check-input,
+.table-appblue td .form-check-input {
+    margin: 0;
+    vertical-align: middle;
+    position: relative;
+    top: 2px;
+    /* adjust if needed to align perfectly */
+}
+
+/* Row hover effect */
+.table-appblue tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    /* subtle white overlay */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Optional: Rounded corners for first/last row */
+.table-appblue tr:first-child th:first-child {
+    border-top-left-radius: 16px;
+}
+
+.table-appblue tr:first-child th:last-child {
+    border-top-right-radius: 16px;
+}
+
+.table-appblue tr:last-child td:first-child {
+    border-bottom-left-radius: 16px;
+}
+
+.table-appblue tr:last-child td:last-child {
+    border-bottom-right-radius: 16px;
+}
+
+/* Remove table footer styling and space below */
+.table-appblue tfoot td {
+    display: none;
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+
+    .table-appblue th,
+    .table-appblue td {
+        font-size: 13px;
+        padding: 9px 6px;
+    }
+
+    .table-appblue {
+        border-radius: 10px;
+    }
+}
+
+/* Subtle row separators for better readability */
+.table-appblue tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #f0f4fa;
+}
+
+/* Highlight selected row */
+.table-appblue tbody tr.selected {
+    background: #dbeafe !important;
+    box-shadow: 0 2px 8px rgba(0, 61, 165, 0.08);
+}
+
+/* Checkbox hover effect */
+.table-appblue td .form-check-input:hover {
+    box-shadow: 0 0 0 2px #e3f0fc;
 }
 
 .login-page {
@@ -19,65 +205,7 @@
     justify-content: center;
 }
 
-.login-card {
-    background: #ffffff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-}
-
-.login-title {
-    color: #007bff;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    font-weight: 500;
-}
-
-.form-control {
-    border-radius: 8px;
-    padding: 0.6rem 0.75rem;
-    border: 1px solid #ccc;
-    transition: border-color 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #00AEEF;
-    box-shadow: 0 0 0 0.2rem rgba(0, 174, 239, 0.25);
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border: none;
-    padding: 0.6rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-    background-color: #0069d9;
-    transform: scale(1.02);
-}
-
-.btn-link {
-    color: #00AEEF;
-    font-weight: 500;
-}
-
-.btn-link:hover {
-    text-decoration: underline;
-}
-
 :root {
-    --primary-color: #003366;
-    --secondary-color: #008080;
-    --background-color: #F5F8FA;
-    --white-color: #FFFFFF;
-    --border-color: #DADFE3;
+    --brand-color: #003DA5;
+    --font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
 }

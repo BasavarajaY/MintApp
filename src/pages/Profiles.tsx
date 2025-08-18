@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import ProfileModal from "./ProfileModal";
 import ConfirmDialog from "../components/ConfirmDialog";
 import AppSpinner from "../components/common/AppSpinner";
+import ErrorState from "../components/common/ErrorState";
 
 const Profiles: React.FC = () => {
   const [profilesData, setProfilesData] = useState<any>(null);
@@ -64,7 +65,7 @@ const Profiles: React.FC = () => {
         toast.success("Profile updated successfully");
       } else {
         await createUFMProfiles(payload);
-        toast.success("Profile added successfully");
+        toast.success("Profile created successfully");
       }
       await loadProfiles();
     } catch (err) {
@@ -118,7 +119,14 @@ const Profiles: React.FC = () => {
   };
 
   if (loading) return <AppSpinner text="Loading Profiles..." />;
-  if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
@@ -135,7 +143,7 @@ const Profiles: React.FC = () => {
               border: "1px solid #003DA5",
               borderRadius: "5px",
               color: "#003DA5",
-              maxWidth: "240px",
+              width: "350px",
             }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

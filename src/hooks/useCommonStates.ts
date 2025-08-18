@@ -13,44 +13,28 @@ export const useCommonTableState = <T>(filterKey: keyof T) => {
     key: keyof T;
     direction: "asc" | "desc";
   } | null>(null);
-//   const [sortConfig, setSortConfig] = useState<{ key: keyof T; direction: "asc" | "desc" }>({
-//   key: "yourDefaultColumn" as keyof T,
-//   direction: "asc",
-// });
 
+  // 🔹 Core effect for filtering + sorting
   useEffect(() => {
     let filtered = filterBySearch(data, searchTerm, filterKey);
 
-    // Apply sorting if active
     if (sortConfig) {
       const { key, direction } = sortConfig;
-      filtered = [...filtered].sort((a, b) => {
-        const aValue = (a[key] ?? "") as string | number;
-        const bValue = (b[key] ?? "") as string | number;
-
-        if (aValue < bValue) return direction === "asc" ? -1 : 1;
-        if (aValue > bValue) return direction === "asc" ? 1 : -1;
-        return 0;
-      });
+      filtered = sortData(filtered, key, direction);
     }
 
     setFilteredData(filtered);
 
-    // Keep only selected items that still exist in filtered list
+    // keep only selected that still exist
     setSelectedItems((prev) =>
       prev.filter((name) =>
-        filtered.some(
-          (item) => String(item[filterKey]) === String(name)
-        )
+        filtered.some((item) => String(item[filterKey]) === String(name))
       )
     );
   }, [searchTerm, data, sortConfig, filterKey]);
 
-  function filterBySearch(
-    items: T[],
-    term: string,
-    key: keyof T
-  ): T[] {
+  // 🔹 Helpers
+  function filterBySearch(items: T[], term: string, key: keyof T): T[] {
     return items.filter((item) =>
       String(item[key] ?? "")
         .toLowerCase()
@@ -58,7 +42,17 @@ export const useCommonTableState = <T>(filterKey: keyof T) => {
     );
   }
 
-  // Helpers
+  function sortData(items: T[], key: keyof T, direction: "asc" | "desc") {
+    return [...items].sort((a, b) => {
+      const aValue = (a[key] ?? "") as string | number;
+      const bValue = (b[key] ?? "") as string | number;
+
+      if (aValue < bValue) return direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
   const handleSelect = (name: string, checked: boolean) => {
     setSelectedItems((prev) =>
       checked ? [...prev, name] : prev.filter((v) => v !== name)
@@ -72,10 +66,7 @@ export const useCommonTableState = <T>(filterKey: keyof T) => {
   const requestSort = (key: keyof T) => {
     setSortConfig((prev) => {
       if (prev?.key === key) {
-        return {
-          key,
-          direction: prev.direction === "asc" ? "desc" : "asc",
-        };
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
       }
       return { key, direction: "asc" };
     });
@@ -94,7 +85,7 @@ export const useCommonTableState = <T>(filterKey: keyof T) => {
     setSearchTerm,
     sortConfig,
     setSortConfig,
-    requestSort,
+    requestSort, // 🔹 exposed to trigger sorting
     selectedItems,
     setSelectedItems,
     handleSelect,

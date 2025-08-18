@@ -1,48 +1,72 @@
-/* src/components/Header.css */
-
 /* Enable dropdown on hover */
 .hover-dropdown:hover .dropdown-menu {
     display: block;
-    margin-top: 0.1rem;
+    margin-top: 0.15rem;
+    animation: fadeIn 0.15s ease-in-out;
+    /* Animation only on hover */
 }
 
-/* White dropdown background */
+/* White dropdown background with subtle shadow */
 .dropdown-menu {
     background-color: #fff;
     min-width: 180px;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 0;
+    border: 1px solid rgba(0, 61, 165, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 61, 165, 0.08);
     z-index: 1000;
 }
 
-/* Hover style */
+/* Dropdown items */
 .dropdown-item {
     padding: 10px 16px;
     color: #000;
     font-weight: 500;
-    transition: all 0.2s ease-in-out;
+    border-radius: 6px;
+    transition: all 0.3s ease, box-shadow 0.3s ease, padding-left 0.3s ease;
 }
 
+/* Hover style with brand blue and glowing background */
 .dropdown-item:hover {
-    background-color: #00bcd4;
-    /* #00AEEF; */
+    background-color: #00AEEF;
     color: #fff;
+    padding-left: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 174, 239, 0.4);
 }
 
-/* Active (selected) dropdown item */
+/* Active dropdown item - only bold + color change */
 .dropdown-item.active {
-    background-color: #00bcd4 !important;
-    color: #fff !important;
+    font-weight: 700;
+    color: #003DA5 !important;
+    background-color: transparent !important;
 }
 
-.active-menu {
-    background-color: #e9f5ff !important;
-    color: #007bff !important;
-    font-weight: bold;
-}
-
+/* Active top menu with pill style */
 .active-top-menu {
-    color: #00bcd4 !important;
-    font-weight: bold;
-    padding-bottom: 2px;
+    background-color: #00AEEF !important;
+    color: #ffffff !important;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect for active top menu */
+.active-top-menu:hover {
+    background-color: #66cfff !important;
+    color: #ffffff !important;
+}
+
+/* Smooth dropdown fade animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

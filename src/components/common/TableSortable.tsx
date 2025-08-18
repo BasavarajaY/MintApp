@@ -19,7 +19,10 @@ function TableSortable<T>({
       onClick={() => requestSort(columnKey)}
       style={{ cursor: "pointer", userSelect: "none" }}
     >
-      {label} <span style={{ color: "#003DA5" }}>{arrow}</span>
+      {label}{" "}
+      <span className="sorter-btn" style={{ color: "#003DA5" }}>
+        {arrow}
+      </span>
     </th>
   );
 }

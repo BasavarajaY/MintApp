@@ -56,6 +56,8 @@ export const useWebSocketManager = <T extends { task_id?: string }>(
                     ...v,
                     process_status: data.process_status,
                     progress_percentage: data.progress_percentage,
+                    success_message: data.success_message,
+                    error_message: data.error_message,
                   }
                 : v
             );

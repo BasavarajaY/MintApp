@@ -13,6 +13,8 @@ import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { NumberRangesItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
+import ErrorState from "../components/common/ErrorState";
+import PageHeader from "./PageHeader";
 
 const NumberRanges: React.FC = () => {
   const {
@@ -29,7 +31,6 @@ const NumberRanges: React.FC = () => {
     requestSort,
     sortConfig,
     selectedItems: selectedNumbers,
-    setSelectedItems: setSelectedNumbers,
     handleSelect,
     handleSelectAll,
     isMigrated,
@@ -68,7 +69,6 @@ const NumberRanges: React.FC = () => {
         setNumberRangesData(data);
         setFilteredNumbers(data);
       } catch (err) {
-        console.error("Error fetching OAuth Credentials:", err);
         setError("Failed to load OAuth Credentials data.");
       } finally {
         setLoading(false);
@@ -78,90 +78,28 @@ const NumberRanges: React.FC = () => {
     loadOAuthCreds();
   }, []);
 
-  useEffect(() => {
-    let filtered = numberRangesData.filter((v) =>
-      v.Name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    // Apply sorting if active
-    if (sortConfig) {
-      const key: keyof NumberRangesItem = sortConfig.key;
-      const direction = sortConfig.direction;
-
-      filtered = [...filtered].sort((a, b) => {
-        if ((a[key] ?? "") < (b[key] ?? "")) {
-          return direction === "asc" ? -1 : 1;
-        }
-        if ((a[key] ?? "") > (b[key] ?? "")) {
-          return direction === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    setFilteredNumbers(filtered);
-
-    // Keep only selected users still in the filtered list
-    setSelectedNumbers((prevSelected) =>
-      prevSelected.filter((name) => filtered.some((item) => item.Name === name))
-    );
-  }, [searchTerm, numberRangesData, sortConfig]);
-
-  //   const formatDate = (dateStr: string): string => {
-  //     const match = /\/Date\((\d+)\)\//.exec(dateStr);
-  //     if (!match) return "—";
-  //     const timestamp = parseInt(match[1], 10);
-  //     const date = new Date(timestamp);
-  //     return new Intl.DateTimeFormat("en-US", {
-  //       year: "numeric",
-  //       month: "short",
-  //       day: "2-digit",
-  //       hour: "numeric",
-  //       minute: "2-digit",
-  //       hour12: true,
-  //     }).format(date);
-  //   };
-
   if (loading) return <AppSpinner text="Loading Number Ranges..." />;
-  if (error) return <div className="text-danger">{error}</div>;
+  if (error) {
+    return (
+      <ErrorState
+        message={error || "Failed to load data."}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <div className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="mb-0" style={{ color: "#003DA5" }}>
-          Number Ranges
-        </h4>
-        <div className="d-flex gap-2 align-items-center">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="form-control"
-            style={{
-              border: "1px solid #003DA5",
-              borderRadius: "5px",
-              color: "#003DA5",
-              maxWidth: "240px",
-            }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button
-            className="btn btn-outline-success fw-bold"
-            onClick={() => {
-              handleMigrate(
-                selectedNumbers,
-                numberRangesData,
-                migrateNumberRanges
-              );
-            }}
-            disabled={selectedNumbers.length === 0}
-            data-bs-toggle="tooltip"
-            title="Migrate selected OAuth Credentials"
-          >
-            <i className="bi bi-cloud-upload me-1"></i>
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Number Ranges"
+        searchPlaceholder="Search..."
+        searchTerm={searchTerm}
+        setSearchTerm={(val) => setSearchTerm(val)}
+        onMigrate={() =>
+          handleMigrate(selectedNumbers, numberRangesData, migrateNumberRanges)
+        }
+        disableMigrate={selectedNumbers.length === 0}
+      />
       <ProfileBanner />
 
       <div
@@ -199,9 +137,24 @@ const NumberRanges: React.FC = () => {
                   requestSort={requestSort}
                 />
                 <th>Description</th>
-                <th>Min. Value</th>
-                <th>Max. Value</th>
-                <th>Rotate</th>
+                <TableSortable<NumberRangesItem>
+                  columnKey="MinValue"
+                  label="Min. Value"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
+                <TableSortable<NumberRangesItem>
+                  columnKey="MaxValue"
+                  label="Max. Value"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
+                <TableSortable<NumberRangesItem>
+                  columnKey="Rotate"
+                  label="Rotate"
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                />
                 <th>Current Value</th>
                 <th>DeployedBy</th>
 
@@ -235,9 +188,6 @@ const NumberRanges: React.FC = () => {
                     <td className="py-2 px-3">{number.Rotate || "—"}</td>
                     <td className="py-2 px-3">{number.CurrentValue || "—"}</td>
                     <td className="py-2 px-3">{number.DeployedBy || "—"}</td>
-                    {/* <td className="py-2 px-3">
-                      {formatDate(number.DeployedOn)}
-                    </td> */}
                     {isMigrated && (
                       <>
                         <td className="py-2 px-3 text-capitalize">

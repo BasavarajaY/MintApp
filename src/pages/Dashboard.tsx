@@ -15,6 +15,7 @@ const ValueMappings = lazy(() => import("./ValueMappings"));
 const OAuthCredentials = lazy(() => import("./OAuthCredentials"));
 const DataStores = lazy(() => import("./DataStores"));
 const PublicCertificates = lazy(() => import("./PublicCertificates"));
+const AccessPolicies = lazy(() => import("./AccessPolicies"));
 
 const Dashboard: React.FC = () => {
   const { showProfSettingModal, setShowProfSettingModal } = useProfileState();
@@ -36,7 +37,7 @@ const Dashboard: React.FC = () => {
         const data = response.data?.user || [];
         sessionStorage.setItem("loggedInUser", JSON.stringify(data));
       } catch (err) {
-        console.error("Error fetching User Credentials:", err);
+        console.error("Error fetching Logged-in user data:", err);
       }
     };
 
@@ -57,14 +58,11 @@ const Dashboard: React.FC = () => {
         import("./OAuthCredentials"),
         import("./DataStores"),
         import("./PublicCertificates"),
+        import("./AccessPolicies"),
       ]);
     };
     prefetch();
   }, []);
-
-  // if (loading) {
-  //   return <AppSpinner fullScreen text="Loading dashboard..." />;
-  // }
 
   return (
     <div>
@@ -85,6 +83,7 @@ const Dashboard: React.FC = () => {
             <Route path="number-ranges" element={<NumberRanges />} />
             <Route path="value-mappings" element={<ValueMappings />} />
             <Route path="data-stores" element={<DataStores />} />
+            <Route path="access-policies" element={<AccessPolicies />} />
             <Route
               path="public-certificates"
               element={<PublicCertificates />}
