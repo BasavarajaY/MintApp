@@ -2,7 +2,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import LoginForm from "./components/LoginForm";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./components/Dashboard";
 
 function App() {
   return (

@@ -9,12 +9,12 @@ import ProfileBanner from "./ProfileBanner";
 import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
-import StatusProgressBar from "../components/common/StatusProgressBar";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
 import type { AccessPolsItem } from "../types";
+import StatusAndProgress from "./StatusAndProgress";
 
 const AccessPolicies: React.FC = () => {
   const {
@@ -172,38 +172,7 @@ const AccessPolicies: React.FC = () => {
                     <td className="py-2 px-3">
                       {accesspol.Description || "—"}
                     </td>
-
-                    {isMigrated && (
-                      <>
-                        <td className="py-2 px-3 text-capitalize">
-                          {accesspol.process_status ? (
-                            <span
-                              className={`badge ${
-                                accesspol.process_status === "success"
-                                  ? "bg-success"
-                                  : accesspol.process_status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : accesspol.process_status === "failed"
-                                  ? "bg-danger"
-                                  : "bg-secondary"
-                              }`}
-                            >
-                              {accesspol.process_status.replace(/_/g, " ")}
-                            </span>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td className="py-2 px-3">
-                          <div style={{ marginTop: "6px" }}>
-                            <StatusProgressBar
-                              percentage={accesspol.progress_percentage}
-                              status={accesspol.process_status}
-                            />
-                          </div>
-                        </td>
-                      </>
-                    )}
+                    {isMigrated && <StatusAndProgress {...accesspol} />}
                   </tr>
                 ))
               )}

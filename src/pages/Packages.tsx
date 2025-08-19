@@ -13,8 +13,8 @@ import { useCommonTableState } from "../hooks/useCommonStates";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
-import StatusProgressBar from "../components/common/StatusProgressBar";
 import TableSortable from "../components/common/TableSortable";
+import StatusAndProgress from "./StatusAndProgress";
 
 const Packages: React.FC = () => {
   const {
@@ -35,6 +35,7 @@ const Packages: React.FC = () => {
     handleSelectAll,
     isMigrated,
     setIsMigrated,
+    formatDate,
   } = useCommonTableState<PackageItem>("Id");
 
   const { connectWebSocket: rawConnectWebSocket } =
@@ -129,13 +130,15 @@ const Packages: React.FC = () => {
                 </th>
                 <TableSortable<PackageItem>
                   columnKey="Name"
-                  label="Name"
+                  label="Package Name"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <th>Version</th>
-                {isMigrated && <th>Status</th>}
-                {isMigrated && <th>Progress</th>}
+                <th className="py-2 px-3">Supported Platform</th>
+                <th className="py-2 px-3">Created By</th>
+                <th className="py-2 px-3">Creation Date</th>
+                {isMigrated && <th className="py-2 px-3">Status</th>}
+                {isMigrated && <th className="py-2 px-3">Progress</th>}
               </tr>
             </thead>
             <tbody>
@@ -155,39 +158,15 @@ const Packages: React.FC = () => {
                         onChange={(e) => handleSelect(pkg.Id, e.target.checked)}
                       />
                     </td>
-                    <td className="py-1 px-3">{pkg.Name || "—"}</td>
-                    <td className="py-2 px-3">{pkg.Version || "—"}</td>
-                    {isMigrated && (
-                      <>
-                        <td className="py-2 px-3 text-capitalize">
-                          {pkg.process_status ? (
-                            <span
-                              className={`badge ${
-                                pkg.process_status === "success"
-                                  ? "bg-success"
-                                  : pkg.process_status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : pkg.process_status === "failed"
-                                  ? "bg-danger"
-                                  : "bg-secondary"
-                              }`}
-                            >
-                              {pkg.process_status.replace(/_/g, " ")}
-                            </span>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td className="py-2 px-3">
-                          <div style={{ marginTop: "6px" }}>
-                            <StatusProgressBar
-                              percentage={pkg.progress_percentage}
-                              status={pkg.process_status}
-                            />
-                          </div>
-                        </td>
-                      </>
-                    )}
+                    <td className="py-1 px-3 text-break">{pkg.Name || "—"}</td>
+                    <td className="py-2 px-3">
+                      {pkg.SupportedPlatform || "—"}
+                    </td>
+                    <td className="py-2 px-3">{pkg.CreatedBy || "—"}</td>
+                    <td className="py-2 px-3">
+                      {formatDate(pkg.CreationDate) || "—"}
+                    </td>
+                    {isMigrated && <StatusAndProgress {...pkg} />}
                   </tr>
                 ))
               )}

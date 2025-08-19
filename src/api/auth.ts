@@ -263,4 +263,26 @@ export const migrateAccessPols = async (payload: {
 export const fetchAccessPolsTaskStatus = async (taskId: string) => {
   return pageInstance.get(`/web/access-policies/status/${taskId}`);
 };
+export const fetchCustomContent = () => {
+  return pageInstance.get(`/web/custom-content/${profileId}`);
+};
+export const migrateCustomContent = async (payload: {
+  module_type: string;
+  data: {
+    Id: string;
+    Name: string;
+    Description: string;
+    ShortText: string;
+    SupportedPlatform: string;
+    ModifiedBy: string;
+    CreationDate: string;
+    ModifiedDate: string;
+  }[];
+  created_by: number;
+}) => {
+  return pageInstance.post(`/web/custom-content/${profileId}`, payload);
+};
+export const fetchCustomContentTaskStatus = async (taskId: string) => {
+  return pageInstance.get(`/web/custom-content/status/${taskId}`);
+};
 

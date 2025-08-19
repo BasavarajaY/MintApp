@@ -1,49 +1,42 @@
-export interface PackageItem {
-  Id: string;
-  Name: string;
-  Version: string;
-  [key: string]: any;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
-}
-export interface VariableItem {
-  VariableName: string;
-  IntegrationFlow: string;
-  Visibility: string;
-  UpdatedAt: string;
-  RetainUntil: string;
+export interface MigrationStatus {
   task_id?: string;
   process_status?: string;
   progress_percentage?: number;
   success_message?: string;
   error_message?: string;
 }
-export interface UserCredItem {
+
+export interface PackageItem extends MigrationStatus {
+  Id: string;
+  Name: string;
+  Version: string;
+  [key: string]: any;
+  CreationDate: string;
+}
+export interface VariableItem extends MigrationStatus {
+  VariableName: string;
+  IntegrationFlow: string;
+  Visibility: string;
+  UpdatedAt: string;
+  RetainUntil: string;
+}
+export interface UserCredItem extends MigrationStatus {
   Name: string;
   Kind: string;
   Description: string;
   User: string;
   Password: string;
   CompanyId: string;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
-  success_message?: string;
-  error_message?: string;
 }
-export interface OAuthCredItem {
+export interface OAuthCredItem extends MigrationStatus {
   Name: string;
   Description: string;
   TokenServiceUrl: string;
   ClientId: string;
   Scope: string;
   Resource: string;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
 }
-export interface NumberRangesItem {
+export interface NumberRangesItem extends MigrationStatus {
   Name: string;
   Description: string;
   MinValue: string;
@@ -53,47 +46,41 @@ export interface NumberRangesItem {
   FieldLength: string;
   DeployedBy: string;
   DeployedOn: Date;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
 }
-export interface ValueMappingsItem {
+export interface ValueMappingsItem extends MigrationStatus {
   Id: string;
   Version: string;
   PackageId: string;
   Name: string;
   Description: string;
   ArtifactContent: string;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
 }
-export interface DataStoresItem {
+export interface DataStoresItem extends MigrationStatus {
   DataStoreName: string;
   IntegrationFlow: string;
   Type: string;
   Visibility: string;
   NumberOfMessages: string;
   NumberOfOverdueMessages: string;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
 }
-export interface PublicCertsItem {
+export interface PublicCertsItem extends MigrationStatus {
   Hexalias: string;
   Alias: string;
   Type: string;
   Owner: string;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
 }
-export interface AccessPolsItem {
+export interface AccessPolsItem extends MigrationStatus {
   Id: string;
   RoleName: string;
   Description: string;
-  task_id?: string;
-  process_status?: string;
-  progress_percentage?: number;
 }
-
+export interface CustomContentItem extends MigrationStatus {
+  Id: string;
+  Name: string;
+  Description: string;
+  ShortText: string;
+  SupportedPlatform: string;
+  ModifiedBy: string;
+  CreationDate: string;
+  ModifiedDate: string;
+}

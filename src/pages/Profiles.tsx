@@ -7,7 +7,7 @@ import {
 } from "../api/auth";
 import toast from "react-hot-toast";
 import ProfileModal from "./ProfileModal";
-import ConfirmDialog from "../components/ConfirmDialog";
+import ConfirmDialog from "../components/common/ConfirmDialog";
 import AppSpinner from "../components/common/AppSpinner";
 import ErrorState from "../components/common/ErrorState";
 

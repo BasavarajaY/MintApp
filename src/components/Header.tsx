@@ -1,7 +1,7 @@
 // src/components/Header.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./Header.css"; // we'll add this next
+import "../styles/Header.css";
 import ProfSettingModal from "../pages/ProfSettingModal";
 import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -78,13 +78,14 @@ const Header: React.FC<HeaderProps> = ({
                 isActiveTopMenu([
                   "/app/dashboard/variables",
                   "/app/dashboard/packages",
-                  "/app/dashboard/usercredentials",
-                  "/app/dashboard/oauthcredentials",
+                  "/app/dashboard/user-credentials",
+                  "/app/dashboard/oauth-credentials",
                   "/app/dashboard/number-ranges",
                   "/app/dashboard/value-mappings",
                   "/app/dashboard/data-stores",
                   "/app/dashboard/public-certificates",
                   "/app/dashboard/access-policies",
+                  "/app/dashboard/custom-content",
                 ])
                   ? "active-top-menu"
                   : "text-white"
@@ -98,11 +99,11 @@ const Header: React.FC<HeaderProps> = ({
                 { path: "/app/dashboard/variables", label: "Variables" },
                 { path: "/app/dashboard/packages", label: "Packages" },
                 {
-                  path: "/app/dashboard/usercredentials",
+                  path: "/app/dashboard/user-credentials",
                   label: "User Credentials",
                 },
                 {
-                  path: "/app/dashboard/oauthcredentials",
+                  path: "/app/dashboard/oauth-credentials",
                   label: "OAuth Credentials",
                 },
                 {
@@ -121,6 +122,10 @@ const Header: React.FC<HeaderProps> = ({
                 {
                   path: "/app/dashboard/access-policies",
                   label: "Access Policies",
+                },
+                {
+                  path: "/app/dashboard/custom-content",
+                  label: "Custom Content",
                 },
               ].map((item) => (
                 <li key={item.path}>

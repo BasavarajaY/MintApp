@@ -140,9 +140,9 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
+        {/* <Button variant="secondary" onClick={onClose}>
           Cancel
-        </Button>
+        </Button> */}
         <Button
           variant="primary"
           onClick={handleSaveProfile}

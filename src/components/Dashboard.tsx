@@ -1,21 +1,22 @@
 import React, { useEffect, useState, Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Header from "../components/Header";
+import Header from "./Header";
 import { useProfileState } from "../hooks/useProfileState";
 import { fetchLoggedInUserData } from "../api/auth";
 
 // Lazy imports
-const Tenants = lazy(() => import("./Tenants"));
-const Profiles = lazy(() => import("./Profiles"));
-const Packages = lazy(() => import("./Packages"));
-const UserCredentials = lazy(() => import("./UserCredentials"));
-const Variables = lazy(() => import("./Variables"));
-const NumberRanges = lazy(() => import("./NumberRanges"));
-const ValueMappings = lazy(() => import("./ValueMappings"));
-const OAuthCredentials = lazy(() => import("./OAuthCredentials"));
-const DataStores = lazy(() => import("./DataStores"));
-const PublicCertificates = lazy(() => import("./PublicCertificates"));
-const AccessPolicies = lazy(() => import("./AccessPolicies"));
+const Tenants = lazy(() => import("../pages/Tenants"));
+const Profiles = lazy(() => import("../pages/Profiles"));
+const Packages = lazy(() => import("../pages/Packages"));
+const UserCredentials = lazy(() => import("../pages/UserCredentials"));
+const Variables = lazy(() => import("../pages/Variables"));
+const NumberRanges = lazy(() => import("../pages/NumberRanges"));
+const ValueMappings = lazy(() => import("../pages/ValueMappings"));
+const OAuthCredentials = lazy(() => import("../pages/OAuthCredentials"));
+const DataStores = lazy(() => import("../pages/DataStores"));
+const PublicCertificates = lazy(() => import("../pages/PublicCertificates"));
+const AccessPolicies = lazy(() => import("../pages/AccessPolicies"));
+const CustomContent = lazy(() => import("../pages/CustomContent"));
 
 const Dashboard: React.FC = () => {
   const { showProfSettingModal, setShowProfSettingModal } = useProfileState();
@@ -48,17 +49,18 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const prefetch = async () => {
       await Promise.all([
-        import("./Tenants"),
-        import("./Profiles"),
-        import("./Packages"),
-        import("./UserCredentials"),
-        import("./Variables"),
-        import("./NumberRanges"),
-        import("./ValueMappings"),
-        import("./OAuthCredentials"),
-        import("./DataStores"),
-        import("./PublicCertificates"),
-        import("./AccessPolicies"),
+        import("../pages/Tenants"),
+        import("../pages/Profiles"),
+        import("../pages/Packages"),
+        import("../pages/UserCredentials"),
+        import("../pages/Variables"),
+        import("../pages/NumberRanges"),
+        import("../pages/ValueMappings"),
+        import("../pages/OAuthCredentials"),
+        import("../pages/DataStores"),
+        import("../pages/PublicCertificates"),
+        import("../pages/AccessPolicies"),
+        import("../pages/CustomContent"),
       ]);
     };
     prefetch();
@@ -78,12 +80,13 @@ const Dashboard: React.FC = () => {
             <Route path="profiles" element={<Profiles />} />
             <Route path="packages" element={<Packages />} />
             <Route path="variables" element={<Variables />} />
-            <Route path="usercredentials" element={<UserCredentials />} />
-            <Route path="oauthcredentials" element={<OAuthCredentials />} />
+            <Route path="user-credentials" element={<UserCredentials />} />
+            <Route path="oauth-credentials" element={<OAuthCredentials />} />
             <Route path="number-ranges" element={<NumberRanges />} />
             <Route path="value-mappings" element={<ValueMappings />} />
             <Route path="data-stores" element={<DataStores />} />
             <Route path="access-policies" element={<AccessPolicies />} />
+            <Route path="custom-content" element={<CustomContent />} />
             <Route
               path="public-certificates"
               element={<PublicCertificates />}

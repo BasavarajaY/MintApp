@@ -9,12 +9,12 @@ import ProfileBanner from "./ProfileBanner";
 import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
-import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { PublicCertsItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
+import StatusAndProgress from "./StatusAndProgress";
 
 const PublicCertificates: React.FC = () => {
   const {
@@ -168,37 +168,7 @@ const PublicCertificates: React.FC = () => {
                     <td className="py-2 px-3">{Cert.Hexalias || "—"}</td>
                     <td className="py-2 px-3">{Cert.Type || "—"}</td>
                     <td className="py-2 px-3">{Cert.Owner || "—"}</td>
-                    {isMigrated && (
-                      <>
-                        <td className="py-2 px-3 text-capitalize">
-                          {Cert.process_status ? (
-                            <span
-                              className={`badge ${
-                                Cert.process_status === "success"
-                                  ? "bg-success"
-                                  : Cert.process_status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : Cert.process_status === "failed"
-                                  ? "bg-danger"
-                                  : "bg-secondary"
-                              }`}
-                            >
-                              {Cert.process_status.replace(/_/g, " ")}
-                            </span>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td className="py-2 px-3">
-                          <div style={{ marginTop: "6px" }}>
-                            <StatusProgressBar
-                              percentage={Cert.progress_percentage}
-                              status={Cert.process_status}
-                            />
-                          </div>
-                        </td>
-                      </>
-                    )}
+                    {isMigrated && <StatusAndProgress {...Cert} />}
                   </tr>
                 ))
               )}

@@ -9,12 +9,12 @@ import ProfileBanner from "./ProfileBanner";
 import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
-import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { OAuthCredItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
+import StatusAndProgress from "./StatusAndProgress";
 
 const OAuthCredentials: React.FC = () => {
   const {
@@ -181,37 +181,7 @@ const OAuthCredentials: React.FC = () => {
                     <td className="py-2 px-3">{user.Description || "—"}</td>
                     <td className="py-2 px-3">{user.TokenServiceUrl || "—"}</td>
                     <td className="py-2 px-3">{user.ClientId || "—"}</td>
-                    {isMigrated && (
-                      <>
-                        <td className="py-2 px-3 text-capitalize">
-                          {user.process_status ? (
-                            <span
-                              className={`badge ${
-                                user.process_status === "success"
-                                  ? "bg-success"
-                                  : user.process_status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : user.process_status === "failed"
-                                  ? "bg-danger"
-                                  : "bg-secondary"
-                              }`}
-                            >
-                              {user.process_status.replace(/_/g, " ")}
-                            </span>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td className="py-2 px-3">
-                          <div style={{ marginTop: "6px" }}>
-                            <StatusProgressBar
-                              percentage={user.progress_percentage}
-                              status={user.process_status}
-                            />
-                          </div>
-                        </td>
-                      </>
-                    )}
+                    {isMigrated && <StatusAndProgress {...user} />}
                   </tr>
                 ))
               )}

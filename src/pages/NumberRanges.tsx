@@ -9,12 +9,12 @@ import ProfileBanner from "./ProfileBanner";
 import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
-import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { NumberRangesItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
+import StatusAndProgress from "./StatusAndProgress";
 
 const NumberRanges: React.FC = () => {
   const {
@@ -188,37 +188,7 @@ const NumberRanges: React.FC = () => {
                     <td className="py-2 px-3">{number.Rotate || "—"}</td>
                     <td className="py-2 px-3">{number.CurrentValue || "—"}</td>
                     <td className="py-2 px-3">{number.DeployedBy || "—"}</td>
-                    {isMigrated && (
-                      <>
-                        <td className="py-2 px-3 text-capitalize">
-                          {number.process_status ? (
-                            <span
-                              className={`badge ${
-                                number.process_status === "success"
-                                  ? "bg-success"
-                                  : number.process_status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : number.process_status === "failed"
-                                  ? "bg-danger"
-                                  : "bg-secondary"
-                              }`}
-                            >
-                              {number.process_status.replace(/_/g, " ")}
-                            </span>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td className="py-2 px-3">
-                          <div style={{ marginTop: "6px" }}>
-                            <StatusProgressBar
-                              percentage={number.progress_percentage}
-                              status={number.process_status}
-                            />
-                          </div>
-                        </td>
-                      </>
-                    )}
+                    {isMigrated && <StatusAndProgress {...number} />}
                   </tr>
                 ))
               )}

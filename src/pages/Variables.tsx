@@ -14,12 +14,12 @@ import VariableModal from "./VariableModal";
 import toast from "react-hot-toast";
 import ProfileBanner from "./ProfileBanner";
 import type { VariableItem } from "../types";
-import StatusProgressBar from "../components/common/StatusProgressBar";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
 import { useMigration } from "../hooks/useMigration";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
+import StatusAndProgress from "./StatusAndProgress";
 
 const Variables: React.FC = () => {
   const {
@@ -287,7 +287,14 @@ const Variables: React.FC = () => {
                     <td className="py-2 px-3">
                       {formatDate(variable.RetainUntil)}
                     </td>
-                    {isMigrated && (
+                    {isMigrated && <StatusAndProgress {...variable} />}
+                    {/* {isMigrated && (
+                      <StatusAndProgress
+                        status={variable.process_status}
+                        percentage={variable.progress_percentage}
+                      />
+                    )} */}
+                    {/* {isMigrated && (
                       <td className="py-2 px-3 text-capitalize">
                         {variable.process_status ? (
                           <span
@@ -318,7 +325,7 @@ const Variables: React.FC = () => {
                           />
                         </div>
                       </td>
-                    )}
+                    )} */}
                   </tr>
                 ))
               )}

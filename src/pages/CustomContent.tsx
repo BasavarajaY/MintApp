@@ -1,27 +1,27 @@
 import { useEffect, useCallback } from "react";
 import {
-  fetchValueMappings,
-  fetchValueMappingsTaskStatus,
-  migrateValueMappings,
+  fetchCustomContent,
+  fetchCustomContentTaskStatus,
+  migrateCustomContent,
 } from "../api/auth";
 import AppSpinner from "../components/common/AppSpinner";
 import ProfileBanner from "./ProfileBanner";
 import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
-import type { ValueMappingsItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
+import type { CustomContentItem } from "../types";
 import StatusAndProgress from "./StatusAndProgress";
 
-const ValueMappings: React.FC = () => {
+const CustomContent: React.FC = () => {
   const {
-    data: ValMapsData,
-    setData: setValueMappingsData,
-    filteredData: filteredValMaps,
-    setFilteredData: setFilteredValMaps,
+    data: customContentData,
+    setData: setCustomContentData,
+    filteredData: filteredCustomContent,
+    setFilteredData: setFilteredCustomContent,
     loading,
     setLoading,
     error,
@@ -30,19 +30,20 @@ const ValueMappings: React.FC = () => {
     setSearchTerm,
     requestSort,
     sortConfig,
-    selectedItems: selectedValMaps,
+    selectedItems: selectedCustomContent,
     handleSelect,
     handleSelectAll,
     isMigrated,
     setIsMigrated,
-  } = useCommonTableState<ValueMappingsItem>("Name");
+    formatDate,
+  } = useCommonTableState<CustomContentItem>("Name");
 
   // ✅ Extract WebSocket handler and wrap it
   const { connectWebSocket: rawConnectWebSocket } =
-    useWebSocketManager<ValueMappingsItem>(
-      setValueMappingsData,
-      setFilteredValMaps,
-      fetchValueMappingsTaskStatus
+    useWebSocketManager<CustomContentItem>(
+      setCustomContentData,
+      setFilteredCustomContent,
+      fetchCustomContentTaskStatus
     );
 
   const connectWebSocket = useCallback(
@@ -51,34 +52,33 @@ const ValueMappings: React.FC = () => {
   );
 
   // ✅ useMigration hook
-  const { handleMigrate } = useMigration<ValueMappingsItem, "Name">({
-    moduleType: "value-mappings",
-    setData: setValueMappingsData,
-    setFilteredData: setFilteredValMaps,
+  const { handleMigrate } = useMigration<CustomContentItem, "Name">({
+    moduleType: "custom-content",
+    setData: setCustomContentData,
+    setFilteredData: setFilteredCustomContent,
     connectWebSocket,
     setIsMigrated,
     matchKey: "Name",
   });
 
   useEffect(() => {
-    const loadOAuthCreds = async () => {
+    const loadAccessPols = async () => {
       try {
-        const response = await fetchValueMappings();
+        const response = await fetchCustomContent();
         const data = response.data?.results || [];
-        console.log(data);
-        setValueMappingsData(data);
-        setFilteredValMaps(data);
+        setCustomContentData(data);
+        setFilteredCustomContent(data);
       } catch (err) {
-        setError("Failed to load Value Mappings data.");
+        setError("Failed to load Custom Content data.");
       } finally {
         setLoading(false);
       }
     };
 
-    loadOAuthCreds();
+    loadAccessPols();
   }, []);
 
-  if (loading) return <AppSpinner text="Loading Value Mappings..." />;
+  if (loading) return <AppSpinner text="Loading Custom Content..." />;
   if (error) {
     return (
       <ErrorState
@@ -91,16 +91,19 @@ const ValueMappings: React.FC = () => {
   return (
     <div className="p-3">
       <PageHeader
-        title="Value Mappings"
+        title="Custom Content"
         searchPlaceholder="Search..."
         searchTerm={searchTerm}
         setSearchTerm={(val) => setSearchTerm(val)}
         onMigrate={() =>
-          handleMigrate(selectedValMaps, ValMapsData, migrateValueMappings)
+          handleMigrate(
+            selectedCustomContent,
+            customContentData,
+            migrateCustomContent
+          )
         }
-        disableMigrate={selectedValMaps.length === 0}
+        disableMigrate={selectedCustomContent.length === 0}
       />
-
       <ProfileBanner />
 
       <div
@@ -120,66 +123,70 @@ const ValueMappings: React.FC = () => {
                   <Form.Check
                     type="checkbox"
                     checked={
-                      filteredValMaps.length > 0 &&
-                      selectedValMaps.length === filteredValMaps.length
+                      filteredCustomContent.length > 0 &&
+                      selectedCustomContent.length ===
+                        filteredCustomContent.length
                     }
                     onChange={(e) =>
                       handleSelectAll(
-                        filteredValMaps.map((u) => u.Name),
+                        filteredCustomContent.map((u) => u.Name),
                         e.target.checked
                       )
                     }
                   />
                 </th>
-                <TableSortable<ValueMappingsItem>
-                  columnKey="Id"
-                  label="Id"
-                  sortConfig={sortConfig}
-                  requestSort={requestSort}
-                />
-                <TableSortable<ValueMappingsItem>
+                <TableSortable<CustomContentItem>
                   columnKey="Name"
                   label="Name"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <TableSortable<ValueMappingsItem>
-                  columnKey="Description"
-                  label="Description"
-                  sortConfig={sortConfig}
-                  requestSort={requestSort}
-                />
-                <th>Version</th>
-                <th>PackageId</th>
+                <th className="py-2 px-3">Description</th>
+                <th className="py-2 px-3">Supported Platform</th>
+                <th className="py-2 px-3">Modified By</th>
+                <th className="py-2 px-3">Creation Date</th>
+                {/* <th className="py-2 px-3">Modified Date</th> */}
                 {isMigrated && <th className="py-2 px-3">Status</th>}
                 {isMigrated && <th className="py-2 px-3">Progress</th>}
               </tr>
             </thead>
             <tbody>
-              {filteredValMaps.length === 0 ? (
+              {filteredCustomContent.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center text-muted py-3">
-                    No Value Mappings records found.
+                    No Custom Content records found.
                   </td>
                 </tr>
               ) : (
-                filteredValMaps.map((ValueMap) => (
-                  <tr key={ValueMap.Name}>
+                filteredCustomContent.map((content) => (
+                  <tr key={content.Name}>
                     <td className="py-2 px-3">
                       <Form.Check
                         type="checkbox"
-                        checked={selectedValMaps.includes(ValueMap.Name)}
+                        checked={selectedCustomContent.includes(content.Name)}
                         onChange={(e) =>
-                          handleSelect(ValueMap.Name, e.target.checked)
+                          handleSelect(content.Name, e.target.checked)
                         }
                       />
                     </td>
-                    <td className="py-2 px-3">{ValueMap.Id || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.Name || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.Description || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.Version || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.PackageId || "—"}</td>
-                    {isMigrated && <StatusAndProgress {...ValueMap} />}
+                    <td className="py-2 px-3 text-break">
+                      {content.Name || "—"}
+                    </td>
+                    <td className="py-2 px-3 text-break">
+                      {content.ShortText || "—"}
+                    </td>
+                    <td className="py-2 px-3">
+                      {content.SupportedPlatform || "—"}
+                    </td>
+                    <td className="py-2 px-3">{content.ModifiedBy || "—"}</td>
+                    <td className="py-2 px-3">
+                      {formatDate(content.CreationDate) || "—"}
+                    </td>
+                    {/* <td className="py-2 px-3">
+                      {formatDate(content.ModifiedDate) || "—"}
+                    </td> */}
+
+                    {isMigrated && <StatusAndProgress {...content} />}
                   </tr>
                 ))
               )}
@@ -191,4 +198,4 @@ const ValueMappings: React.FC = () => {
   );
 };
 
-export default ValueMappings;
+export default CustomContent;

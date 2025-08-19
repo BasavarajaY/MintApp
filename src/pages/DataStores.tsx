@@ -9,12 +9,12 @@ import ProfileBanner from "./ProfileBanner";
 import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
-import StatusProgressBar from "../components/common/StatusProgressBar";
 import type { DataStoresItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
+import StatusAndProgress from "./StatusAndProgress";
 
 const DataStores: React.FC = () => {
   const {
@@ -177,37 +177,7 @@ const DataStores: React.FC = () => {
                     <td className="py-2 px-3">
                       {datastore.NumberOfOverdueMessages || "—"}
                     </td>
-                    {isMigrated && (
-                      <>
-                        <td className="py-2 px-3 text-capitalize">
-                          {datastore.process_status ? (
-                            <span
-                              className={`badge ${
-                                datastore.process_status === "success"
-                                  ? "bg-success"
-                                  : datastore.process_status === "pending"
-                                  ? "bg-warning text-dark"
-                                  : datastore.process_status === "failed"
-                                  ? "bg-danger"
-                                  : "bg-secondary"
-                              }`}
-                            >
-                              {datastore.process_status.replace(/_/g, " ")}
-                            </span>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td className="py-2 px-3">
-                          <div style={{ marginTop: "6px" }}>
-                            <StatusProgressBar
-                              percentage={datastore.progress_percentage}
-                              status={datastore.process_status}
-                            />
-                          </div>
-                        </td>
-                      </>
-                    )}
+                    {isMigrated && <StatusAndProgress {...datastore} />}
                   </tr>
                 ))
               )}
