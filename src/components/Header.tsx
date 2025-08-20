@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import ProfSettingModal from "../pages/ProfSettingModal";
-import { useLocation } from "react-router-dom";
+import { useLocation, NavLink } from "react-router-dom";
 import toast from "react-hot-toast";
 
 interface HeaderProps {
@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({
     return paths.some((path) => currentPath.startsWith(path));
   };
 
-  const isActiveItem = (path: string) => currentPath === path;
+  // const isActiveItem = (path: string) => currentPath === path;
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -129,14 +129,22 @@ const Header: React.FC<HeaderProps> = ({
                 },
               ].map((item) => (
                 <li key={item.path}>
-                  <a
+                  {/* <a
                     href={item.path}
                     className={`dropdown-item ${
                       isActiveItem(item.path) ? "active" : ""
                     }`}
                   >
                     {item.label}
-                  </a>
+                  </a> */}
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `dropdown-item ${isActive ? "active" : ""}`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -162,16 +170,14 @@ const Header: React.FC<HeaderProps> = ({
                 { path: "/app/dashboard/tenants", label: "Tenants" },
                 { path: "/app/dashboard/profiles", label: "Profiles" },
               ].map((item) => (
-                <li key={item.path}>
-                  <a
-                    href={item.path}
-                    className={`dropdown-item ${
-                      isActiveItem(item.path) ? "active" : ""
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                </li>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `dropdown-item ${isActive ? "active" : ""}`
+                  }
+                >
+                  {item.label}
+                </NavLink>
               ))}
             </ul>
           </div>

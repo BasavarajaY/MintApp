@@ -1,4 +1,5 @@
 // src/api/auth.ts
+import type { AccessPolsItem, CustomContentItem, DataStoresItem, NumberRangesItem, OAuthCredItem, PackageItem, PublicCertsItem, UserCredItem, ValueMappingsItem, VariableItem } from '../types';
 import { otpInstance } from './axiosInstance';
 import { pageInstance } from './axiosInstance';
 
@@ -81,11 +82,7 @@ export const fetchPackageDetails = async (packageId: string) => {
 };
 export const migratePackages = async (payload: {
   module_type: string;
-  data: {
-    Id: string;
-    Name: string;
-    Version: string;
-  }[];
+  data: PackageItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/prepackaged-content/${profileId}`, payload);
@@ -98,26 +95,14 @@ export const fetchVariables = () => {
 };
 export const createVariables = async (payload: {
   module_type: string;
-  data: {
-    VariableName: string;
-    IntegrationFlow: string;
-    Visibility: string;
-    UpdatedAt: string;
-    RetainUntil: string;
-  }[];
+  data: VariableItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/variables/${profileId}`, payload);
 };
 export const migrateVariables = async (payload: {
   module_type: string;
-  data: {
-    VariableName: string;
-    IntegrationFlow: string;
-    Visibility: string;
-    UpdatedAt: string;
-    RetainUntil: string;
-  }[];
+  data: VariableItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/variables/${profileId}`, payload);
@@ -130,14 +115,7 @@ export const fetchUserCredentials = () => {
 };
 export const migrateUserCreds = async (payload: {
   module_type: string;
-  data: {
-    Name: string;
-    Kind: string;
-    Description: string;
-    User: string;
-    Password: string;
-    CompanyId: string;
-  }[];
+  data: UserCredItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/user-credentials/${profileId}`, payload);
@@ -150,14 +128,7 @@ export const fetchOAuthCredentials = () => {
 };
 export const migrateOAuthCreds = async (payload: {
   module_type: string;
-  data: {
-    Name: string;
-    Description: string;
-    TokenServiceUrl: string;
-    ClientId: string;
-    Scope: string;
-    Resource: string;
-  }[];
+  data: OAuthCredItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/oauth2-credentials/${profileId}`, payload);
@@ -170,17 +141,7 @@ export const fetchNumberRanges = () => {
 };
 export const migrateNumberRanges = async (payload: {
   module_type: string;
-  data: {
-    Name: string;
-    Description: string;
-    MinValue: string;
-    MaxValue: string;
-    Rotate: string;
-    CurrentValue: string;
-    FieldLength: string;
-    DeployedBy: string;
-    DeployedOn: Date;
-  }[];
+  data: NumberRangesItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/number-ranges/${profileId}`, payload);
@@ -193,14 +154,7 @@ export const fetchValueMappings = () => {
 };
 export const migrateValueMappings = async (payload: {
   module_type: string;
-  data: {
-    Id: string;
-    Version: string;
-    PackageId: string;
-    Name: string;
-    Description: string;
-    ArtifactContent: string;
-  }[];
+  data: ValueMappingsItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/value-mappings/${profileId}`, payload);
@@ -213,14 +167,7 @@ export const fetchDataStores = () => {
 };
 export const migrateDataStores = async (payload: {
   module_type: string;
-  data: {
-    DataStoreName: string;
-    IntegrationFlow: string;
-    Type: string;
-    Visibility: string;
-    NumberOfMessages: string;
-    NumberOfOverdueMessages: string;
-  }[];
+  data: DataStoresItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/datastores/${profileId}`, payload);
@@ -233,12 +180,7 @@ export const fetchPublicCerts = () => {
 };
 export const migratePublicCerts = async (payload: {
   module_type: string;
-  data: {
-    Hexalias: string;
-    Alias: string;
-    Type: string;
-    Owner: string;
-  }[];
+  data: PublicCertsItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/datastores/${profileId}`, payload);
@@ -251,11 +193,7 @@ export const fetchAccessPols = () => {
 };
 export const migrateAccessPols = async (payload: {
   module_type: string;
-  data: {
-    Id: string;
-    RoleName: string;
-    Description: string;
-  }[];
+  data: AccessPolsItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/access-policies/${profileId}`, payload);
@@ -268,16 +206,7 @@ export const fetchCustomContent = () => {
 };
 export const migrateCustomContent = async (payload: {
   module_type: string;
-  data: {
-    Id: string;
-    Name: string;
-    Description: string;
-    ShortText: string;
-    SupportedPlatform: string;
-    ModifiedBy: string;
-    CreationDate: string;
-    ModifiedDate: string;
-  }[];
+  data: CustomContentItem[];
   created_by: number;
 }) => {
   return pageInstance.post(`/web/custom-content/${profileId}`, payload);
