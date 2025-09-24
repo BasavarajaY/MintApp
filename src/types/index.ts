@@ -1,3 +1,15 @@
+export interface LoginPayload {
+  email: string;
+  otp?: string;
+}
+export interface RegisterPayload {
+  name?: string;
+  email?: string;
+  company_name?: string;
+  mobile?: string;
+  otp?: string;
+  subscription_plan?: string;
+}
 export interface MigrationStatus {
   task_id?: string;
   process_status?: string;
@@ -84,3 +96,19 @@ export interface CustomContentItem extends MigrationStatus {
   CreationDate: string;
   ModifiedDate: string;
 }
+export interface CertToServKeyItem extends MigrationStatus {
+  Id: string;
+  User: string;
+  Certificate: string;
+  LastModifiedBy: string;
+  CreatedBy: string;
+  LastModifiedTime: Date;
+  CreatedTime: Date;
+  ValidUntil: Date;
+}
+export interface CustomTagsItem extends MigrationStatus {
+  tagName: string;
+  permittedValues: string;
+  isMandatory: boolean;
+}
+

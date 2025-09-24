@@ -89,7 +89,7 @@ const Packages: React.FC = () => {
   return (
     <div className="p-3">
       <PageHeader
-        title="Packages"
+        title="Pre-Packaged Content"
         searchPlaceholder="Search..."
         searchTerm={searchTerm}
         setSearchTerm={(val) => setSearchTerm(val)}

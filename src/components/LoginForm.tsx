@@ -4,16 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { requestOtp, resendOtp, verifyOtp } from "../api/auth";
 import toast from "react-hot-toast";
 import { brandColors } from "../styles/brandColors";
+import StepHeader from "./StepHeader";
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [otpRequested, setOtpRequested] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [otp, setOtp] = useState(Array(6).fill(""));
+  const [error, setError] = React.useState<string>("");
 
   const handleRequestOtp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,14 +42,17 @@ const LoginForm: React.FC = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!password) {
-      alert("Please enter the OTP from your email.");
+    const otpValue = otp.join("");
+
+    if (!otpValue || otpValue.length < 6) {
+      setError("Please enter the complete Email OTP");
+      // alert("Please enter the complete 6-digit OTP.");
       return;
     }
-
+    setError("");
     try {
       setLoading(true);
-      const response = await verifyOtp({ email, otp: password });
+      const response = await verifyOtp({ email, otp: otpValue });
       const accessToken = response.data?.access_token;
       if (!accessToken) throw new Error("Access token not found in response");
 
@@ -86,104 +91,148 @@ const LoginForm: React.FC = () => {
       setLoading(false);
     }
   };
+  const handleOtpChange = (index: number, value: string) => {
+    const newOtp = [...otp];
+    newOtp[index] = value.replace(/[^0-9]/g, ""); // only digits allowed
+    setOtp(newOtp);
+
+    // auto move to next box
+    if (value && index < otp.length - 1) {
+      const next = document.querySelector<HTMLInputElement>(
+        `#otp-${index + 1}`
+      );
+      next?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      const prev = document.querySelector<HTMLInputElement>(
+        `#otp-${index - 1}`
+      );
+      prev?.focus();
+    }
+  };
 
   return (
-    <div
-      className="d-flex justify-content-center align-items-center vh-100"
-      style={{
-        backgroundColor: brandColors.primary,
-      }}
-    >
-      <div
-        className="card shadow-lg p-4"
-        style={{
-          width: "100%",
-          maxWidth: "400px",
-          borderRadius: "12px",
-          backgroundColor: brandColors.white,
-        }}
-      >
-        <h2 className="text-center mb-4" style={{ color: brandColors.primary }}>
-          Login
-        </h2>
+    <div className="vh-100 d-flex flex-column">
+      {/* 🔹 Step Header (no steps, but shows Sign Up) */}
+      <StepHeader showSteps={false} showSignUpButton />
 
-        <form
-          noValidate
-          className={validated ? "was-validated" : ""}
-          onSubmit={otpRequested ? handleLogin : handleRequestOtp}
+      {/* 🔹 Main Content */}
+      <div className="d-flex justify-content-center align-items-center flex-grow-1 bg-light">
+        {/* Login Card */}
+        <div
+          className="card shadow p-4"
+          style={{
+            width: "100%",
+            maxWidth: "400px",
+            borderRadius: "12px",
+          }}
         >
-          {/* Email */}
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label fw-bold">
-              Email address
-            </label>
-            <input
-              type="email"
-              className="form-control"
-              id="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={otpRequested || loading}
-            />
-            <div className="invalid-feedback">Please enter a valid email.</div>
-          </div>
+          {/* Title */}
+          <h3
+            className="text-center fw-bold mb-4"
+            style={{ color: brandColors.primary }}
+          >
+            Login to your account
+          </h3>
 
-          {/* Password */}
-          {otpRequested && (
+          <form
+            noValidate
+            className={validated ? "was-validated" : ""}
+            onSubmit={otpRequested ? handleLogin : handleRequestOtp}
+          >
+            {/* Email */}
             <div className="mb-3">
-              <label htmlFor="password" className="form-label fw-bold">
-                Enter OTP (from email)
+              <label htmlFor="email" className="form-label fw-semibold">
+                Email Address
               </label>
               <input
-                type="password"
+                type="email"
                 className="form-control"
-                id="password"
+                id="email"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={otpRequested || loading}
               />
-              <div className="invalid-feedback">OTP is required.</div>
+              <div className="invalid-feedback">
+                Please enter a valid email.
+              </div>
             </div>
-          )}
+            {/* OTP Input */}
+            {otpRequested && (
+              <div className="mb-3">
+                <label htmlFor="otp" className="form-label fw-semibold">
+                  Enter OTP (from email)
+                </label>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="btn w-100 fw-bold"
-            style={{
-              backgroundColor: brandColors.secondary,
-              borderColor: brandColors.secondary,
-              color: brandColors.white,
-            }}
-            disabled={loading}
-          >
-            {loading
-              ? "Please wait..."
-              : otpRequested
-              ? "Login"
-              : "Request OTP"}
-          </button>
+                <div className="d-flex justify-content-between">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      className="form-control text-center mx-1"
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        fontSize: "1.5rem",
+                      }}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(e, index)}
+                      id={`otp-${index}`}
+                      disabled={loading}
+                    />
+                  ))}
+                </div>
 
-          {/* Resend OTP */}
-          {otpRequested && (
-            <div className="text-center mt-3">
-              <button
-                type="button"
-                className="btn btn-link p-0"
-                style={{
-                  color: brandColors.secondary,
-                  fontWeight: "bold",
-                }}
-                onClick={handleResendOtp}
-                disabled={loading || resendCooldown > 0 || !email}
+                <div className="invalid-feedback">OTP is required.</div>
+              </div>
+            )}
+            {error && (
+              <div
+                className="text-danger mt-2 fw-semibold mb-2"
+                style={{ fontSize: "14px" }}
               >
-                Resend OTP {resendCooldown > 0 && `(${resendCooldown}s)`}
-              </button>
-            </div>
-          )}
-        </form>
+                {error}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading}
+            >
+              {loading
+                ? "Please wait..."
+                : otpRequested
+                ? "Login"
+                : "Request OTP"}
+            </button>
+
+            {/* Resend OTP */}
+            {otpRequested && (
+              <div className="text-center mt-3">
+                <button
+                  type="button"
+                  className="btn btn-link p-0 fw-semibold"
+                  onClick={handleResendOtp}
+                  disabled={loading || resendCooldown > 0 || !email}
+                >
+                  Resend OTP {resendCooldown > 0 && `(${resendCooldown}s)`}
+                </button>
+              </div>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );

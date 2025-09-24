@@ -10,6 +10,8 @@ const Profiles = lazy(() => import("../pages/Profiles"));
 const Packages = lazy(() => import("../pages/Packages"));
 const UserCredentials = lazy(() => import("../pages/UserCredentials"));
 const Variables = lazy(() => import("../pages/Variables"));
+const CertToServKey = lazy(() => import("../pages/CertToServKey"));
+const CustomTags = lazy(() => import("../pages/CustomTags"));
 const NumberRanges = lazy(() => import("../pages/NumberRanges"));
 const ValueMappings = lazy(() => import("../pages/ValueMappings"));
 const OAuthCredentials = lazy(() => import("../pages/OAuthCredentials"));
@@ -54,6 +56,8 @@ const Dashboard: React.FC = () => {
         import("../pages/Packages"),
         import("../pages/UserCredentials"),
         import("../pages/Variables"),
+        import("../pages/CertToServKey"),
+        import("../pages/CustomTags"),
         import("../pages/NumberRanges"),
         import("../pages/ValueMappings"),
         import("../pages/OAuthCredentials"),
@@ -80,6 +84,8 @@ const Dashboard: React.FC = () => {
             <Route path="profiles" element={<Profiles />} />
             <Route path="packages" element={<Packages />} />
             <Route path="variables" element={<Variables />} />
+            <Route path="cert-servkey" element={<CertToServKey />} />
+            <Route path="custom-tags" element={<CustomTags />} />
             <Route path="user-credentials" element={<UserCredentials />} />
             <Route path="oauth-credentials" element={<OAuthCredentials />} />
             <Route path="number-ranges" element={<NumberRanges />} />
@@ -87,6 +93,7 @@ const Dashboard: React.FC = () => {
             <Route path="data-stores" element={<DataStores />} />
             <Route path="access-policies" element={<AccessPolicies />} />
             <Route path="custom-content" element={<CustomContent />} />
+
             <Route
               path="public-certificates"
               element={<PublicCertificates />}

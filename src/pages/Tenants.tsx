@@ -4,8 +4,7 @@ import {
   createSourceTenant,
   createTargetTenant,
   fetchTenants,
-  // updateTenant,
-  deleteTenant,
+  updateTenant,
 } from "../api/auth";
 import AddTenantModal from "./TenantModal";
 import toast from "react-hot-toast";
@@ -23,74 +22,8 @@ const Tenants: React.FC = () => {
   const [isEdit, setIsEdit] = useState(false);
 
   useEffect(() => {
-    const loadTenant = async () => {
-      try {
-        const { data } = await fetchTenants();
-        setTenantsData(data.tenants);
-        setFilteredData(data.tenants);
-      } catch (err: any) {
-        setError("Failed to load tenant data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadTenant();
+    loadTenants();
   }, []);
-
-  useEffect(() => {
-    const filtered = tenantsData.filter((tenant: any) =>
-      tenant.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filtered);
-  }, [searchTerm, tenantsData]);
-
-  const formatDate = (timestamp: number | null) => {
-    if (!timestamp) return "—";
-    const date = new Date(timestamp * 1000);
-    // return date.toLocaleString();
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }).format(date);
-  };
-
-  const handleAddTenant = async (tenant: { name: string; type: string }) => {
-    const payload = {
-      tenant_name: tenant.name,
-      tenant_type: tenant.type,
-      tenant_token_url: "",
-      tenant_client_id: "",
-      tenant_client_secret: "",
-      tenant_api_url: "",
-      tenant_neo_domain: null,
-      tenant_neo_client_id: null,
-      tenant_neo_client_secret: null,
-      tenant_neo_account_id: null,
-      tenant_neo_iflow_host: null,
-      tenant_neo_iflow_user: null,
-      tenant_neo_iflow_password: null,
-      tenant_cf_domain: "",
-      tenant_cf_user: "",
-      tenant_cf_password: "",
-      tenant_cf_org_id: "",
-      tenant_cf_space_name: "",
-      created_by: null,
-    };
-
-    if (tenant.type === "100001") {
-      await createSourceTenant(payload);
-    } else {
-      await createTargetTenant(payload);
-    }
-
-    toast.success("Tenant added successfully!");
-    await loadTenants();
-  };
 
   const loadTenants = async () => {
     try {
@@ -105,26 +38,118 @@ const Tenants: React.FC = () => {
     }
   };
 
-  const handleEditTenant = (tenant: any) => {
-    setSelectedTenant(tenant);
-    setIsEdit(true);
-    setShowModal(true);
+  useEffect(() => {
+    const filtered = tenantsData.filter((tenant: any) =>
+      tenant.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredData(filtered);
+  }, [searchTerm, tenantsData]);
+
+  const formatDate = (timestamp: number | null) => {
+    if (!timestamp) return "—";
+    const date = new Date(timestamp * 1000);
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date);
   };
 
-  const handleDeleteTenant = async (tenantId: number) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this tenant?"
-    );
-    if (!confirmDelete) return;
+  // Handle Add or Update Tenant
+  // Handle Add or Update Tenant
+  const handleSaveTenant = async (tenant: any) => {
+    const storedUser = sessionStorage.getItem("loggedInUser");
+    const userData = storedUser ? JSON.parse(storedUser) : null;
+    const payload: any = {
+      tenant_name: tenant.name,
+      tenant_type: Number(tenant.type),
+      tenant_token_url: tenant.tokenUrl,
+      tenant_client_id: tenant.clientId,
+      tenant_client_secret: tenant.clientSecret,
+      tenant_api_url: tenant.apiUrl,
+      created_by: userData?.id,
+    };
+
+    if (tenant.type === "100001") {
+      // Source (Neo)
+      Object.assign(payload, {
+        tenant_neo_domain: tenant.neoDomain,
+        tenant_neo_client_id: tenant.neoClientId,
+        tenant_neo_client_secret: tenant.neoClientSecret,
+        tenant_neo_account_id: tenant.neoAccountId,
+        tenant_neo_iflow_host: tenant.neoIflowHost,
+        tenant_neo_iflow_user: tenant.neoIflowUser,
+        tenant_neo_iflow_password: tenant.neoIflowPassword,
+        // CF values not applicable
+        tenant_cf_domain: null,
+        tenant_cf_user: null,
+        tenant_cf_password: null,
+        tenant_cf_org_id: null,
+        tenant_cf_space_name: null,
+      });
+    } else if (tenant.type === "100002") {
+      // Target (CF)
+      Object.assign(payload, {
+        tenant_cf_domain: tenant.cfDomain,
+        tenant_cf_user: tenant.cfUser,
+        tenant_cf_password: tenant.cfPassword,
+        tenant_cf_org_id: tenant.cfOrgId,
+        tenant_cf_space_name: tenant.cfSpaceName,
+        // Neo values not applicable
+        tenant_neo_domain: null,
+        tenant_neo_client_id: null,
+        tenant_neo_client_secret: null,
+        tenant_neo_account_id: null,
+        tenant_neo_iflow_host: null,
+        tenant_neo_iflow_user: null,
+        tenant_neo_iflow_password: null,
+      });
+    }
 
     try {
-      await deleteTenant(tenantId);
-      toast.success("Tenant deleted successfully");
+      if (isEdit && selectedTenant) {
+        await updateTenant(selectedTenant.tenant_id, payload);
+        toast.success("Tenant updated successfully!");
+      } else {
+        if (tenant.type === "100001") {
+          await createSourceTenant(payload);
+          toast.success("Source tenant created successfully!");
+        } else {
+          await createTargetTenant(payload);
+          toast.success("Target tenant created successfully!");
+        }
+      }
+
       await loadTenants();
     } catch (err) {
-      toast.error("Failed to delete tenant");
+      toast.error("Failed to save tenant");
+      console.error("Error saving tenant:", err);
     }
   };
+
+  // const handleEditTenant = (tenant: any) => {
+  //   setSelectedTenant(tenant);
+  //   setIsEdit(true);
+  //   setShowModal(true);
+  // };
+
+  // const handleDeleteTenant = async (tenantId: number) => {
+  //   const confirmDelete = window.confirm(
+  //     "Are you sure you want to delete this tenant?"
+  //   );
+  //   if (!confirmDelete) return;
+
+  //   try {
+  //     await deleteTenant(tenantId);
+  //     toast.success("Tenant deleted successfully");
+  //     await loadTenants();
+  //   } catch (err) {
+  //     toast.error("Failed to delete tenant");
+  //   }
+  // };
 
   if (loading) return <AppSpinner text="Loading Tenants..." />;
   if (error) {
@@ -174,7 +199,7 @@ const Tenants: React.FC = () => {
                 setSelectedTenant(null);
                 setIsEdit(false);
               }}
-              onAdd={handleAddTenant}
+              onAdd={handleSaveTenant}
               initialData={selectedTenant}
               isEdit={isEdit}
             />
@@ -208,13 +233,13 @@ const Tenants: React.FC = () => {
                 <th className="py-2 px-3">Created By</th>
                 <th className="py-2 px-3">Created On</th>
                 <th className="py-2 px-3">Modified On</th>
-                <th className="py-2 px-3">Action</th>
+                {/* <th className="py-2 px-3">Action</th> */}
               </tr>
             </thead>
             <tbody>
               {filteredData.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center text-muted py-3">
+                  <td colSpan={7} className="text-center text-muted py-3">
                     No tenant records found.
                   </td>
                 </tr>
@@ -233,7 +258,7 @@ const Tenants: React.FC = () => {
                     <td className="py-2 px-3">
                       {formatDate(tenant.modified_on)}
                     </td>
-                    <td className="py-2 px-3">
+                    {/* <td className="py-2 px-3">
                       <div className="d-flex gap-3 align-items-center">
                         <i
                           className="bi bi-pencil-square"
@@ -241,6 +266,7 @@ const Tenants: React.FC = () => {
                             color: "#FFC107",
                             cursor: "pointer",
                             fontSize: "1.2rem",
+                            display: "none",
                           }}
                           title="Edit"
                           onClick={() => handleEditTenant(tenant)}
@@ -251,12 +277,13 @@ const Tenants: React.FC = () => {
                             color: "#DC3545",
                             cursor: "pointer",
                             fontSize: "1.2rem",
+                            display: "none",
                           }}
                           title="Delete"
                           onClick={() => handleDeleteTenant(tenant.tenant_id)}
                         ></i>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               )}

@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import toast from "react-hot-toast";
-import { fetchMintProfiles } from "../api/auth";
+import { fetchMintProfiles, fetchTenants } from "../api/auth"; // ✅ make sure fetchTenants exists
 
 interface Profile {
   mint_profile_id?: number;
   mint_profile_name: string;
-  mint_profile_environment_id: number;
+  mint_profile_environment_id: string;
   mint_profile_source_runtime: string;
   mint_profile_destination_runtime: string;
+  mint_profile_primary_tenant_id?: number;
+  mint_profile_secondary_tenant_id?: number;
+
+  // Enriched fields
+  source_tenant_name?: string;
+  target_tenant_name?: string;
 }
 
 interface Props {
@@ -18,46 +24,66 @@ interface Props {
 
 const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [selectedProfileId, setSelectedProfileId] = useState<
-    number | undefined
-  >(undefined);
+  const [selectedProfileId, setSelectedProfileId] = useState<number | "">("");
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (show) {
-      loadProfilesAndPreselect();
+      loadProfilesAndTenants();
     }
   }, [show]);
 
-  const loadProfilesAndPreselect = async () => {
+  const loadProfilesAndTenants = async () => {
     setLoading(true);
     try {
-      const response = await fetchMintProfiles();
-      const fetchedProfiles = response.data;
-      setProfiles(fetchedProfiles);
+      const [profilesRes, tenantsRes] = await Promise.all([
+        fetchMintProfiles(),
+        fetchTenants(),
+      ]);
 
-      // Try to preselect from sessionStorage
+      const profiles: Profile[] = profilesRes.data;
+      const tenants = tenantsRes.data.tenants || [];
+
+      // Build tenant map
+      const tenantMap: Record<number, string> = {};
+      tenants.forEach((t: any) => {
+        tenantMap[t.tenant_id] = t.tenant_name;
+      });
+
+      // ✅ Enrich profiles with tenant names
+      const enrichedProfiles = profiles.map((p) => ({
+        ...p,
+        source_tenant_name:
+          tenantMap[p.mint_profile_primary_tenant_id ?? -1] || "Unknown Tenant",
+        target_tenant_name:
+          tenantMap[p.mint_profile_secondary_tenant_id ?? -1] ||
+          "Unknown Tenant",
+      }));
+
+      setProfiles(enrichedProfiles);
+
+      // Preselect from sessionStorage
       const stored = sessionStorage.getItem("selectedProfile");
       if (stored) {
         const parsed = JSON.parse(stored);
-        const match = fetchedProfiles.find(
-          (p: Profile) => p.mint_profile_id === parsed.mint_profile_id
+        const match = enrichedProfiles.find(
+          (p) => p.mint_profile_id === parsed.mint_profile_id
         );
         if (match) {
-          setSelectedProfileId(match.mint_profile_id);
+          setSelectedProfileId(match.mint_profile_id ?? "");
           setSelectedProfile(match);
-          return; // ✅ stop here, we already set it
+          return;
         }
       }
 
-      // If no stored profile, default to first profile
-      if (fetchedProfiles.length > 0) {
-        setSelectedProfileId(fetchedProfiles[0].mint_profile_id);
-        setSelectedProfile(fetchedProfiles[0]);
+      // If no stored profile, default to first
+      if (enrichedProfiles.length > 0) {
+        setSelectedProfileId(enrichedProfiles[0].mint_profile_id ?? "");
+        setSelectedProfile(enrichedProfiles[0]);
       }
     } catch (error) {
-      console.error("Error fetching profiles:", error);
+      console.error("Error fetching profiles/tenants:", error);
     } finally {
       setLoading(false);
     }
@@ -66,7 +92,7 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const profileId = value ? parseInt(value, 10) : undefined;
-    setSelectedProfileId(profileId);
+    setSelectedProfileId(profileId ?? "");
     const profile = profiles.find((p) => p.mint_profile_id === profileId);
     setSelectedProfile(profile || null);
   };
@@ -81,8 +107,6 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
     });
 
     onClose();
-    // navigate("/app/dashboard/tenants", { replace: true });
-    // Redirect to tenants and reload
     window.location.href = "/app/dashboard/tenants";
   };
 
@@ -114,35 +138,31 @@ const ProfSettingModal: React.FC<Props> = ({ show, onClose }) => {
             <Spinner />
           </div>
         ) : (
-          <>
-            {selectedProfile && (
-              <div
-                className="mt-3 p-3 border rounded"
-                style={{
-                  backgroundColor: "#9eeaf9",
-                }}
-              >
-                <h5>{selectedProfile.mint_profile_name}</h5>
-                <p>
-                  Environment:{" "}
-                  {selectedProfile.mint_profile_environment_id || "N/A"}
-                </p>
-                <p>
-                  Source: {selectedProfile.mint_profile_source_runtime || "N/A"}
-                </p>
-                <p>
-                  Destination:{" "}
-                  {selectedProfile.mint_profile_destination_runtime || "N/A"}
-                </p>
-              </div>
-            )}
-          </>
+          selectedProfile && (
+            <div
+              className="mt-3 p-3 border rounded"
+              style={{ backgroundColor: "#9eeaf9" }}
+            >
+              <h5>{selectedProfile.mint_profile_name}</h5>
+              <p>
+                Environment:{" "}
+                {selectedProfile.mint_profile_environment_id || "N/A"}
+              </p>
+              <p>Source Tenant: {selectedProfile.source_tenant_name}</p>
+              <p>Target Tenant: {selectedProfile.target_tenant_name}</p>
+              <p>
+                Source Runtime:{" "}
+                {selectedProfile.mint_profile_source_runtime || "N/A"}
+              </p>
+              <p>
+                Target Runtime:{" "}
+                {selectedProfile.mint_profile_destination_runtime || "N/A"}
+              </p>
+            </div>
+          )
         )}
       </Modal.Body>
       <Modal.Footer>
-        {/* <Button variant="secondary" onClick={onClose}>
-          Cancel
-        </Button> */}
         <Button
           variant="primary"
           onClick={handleSaveProfile}

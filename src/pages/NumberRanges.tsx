@@ -91,7 +91,7 @@ const NumberRanges: React.FC = () => {
   return (
     <div className="p-3">
       <PageHeader
-        title="Number Ranges"
+        title="Number Ranges Objects"
         searchPlaceholder="Search..."
         searchTerm={searchTerm}
         setSearchTerm={(val) => setSearchTerm(val)}

@@ -1,27 +1,27 @@
 import { useEffect, useCallback } from "react";
 import {
-  fetchValueMappings,
-  fetchValueMappingsTaskStatus,
-  migrateValueMappings,
+  fetchCustomTags,
+  fetchCustomTagsTaskStatus,
+  migrateCustomTags,
 } from "../api/auth";
 import AppSpinner from "../components/common/AppSpinner";
 import ProfileBanner from "./ProfileBanner";
 import { Form } from "react-bootstrap";
 import { useMigration } from "../hooks/useMigration";
 import { useWebSocketManager } from "../hooks/useWebSocketManager";
-import type { ValueMappingsItem } from "../types";
 import { useCommonTableState } from "../hooks/useCommonStates";
 import TableSortable from "../components/common/TableSortable";
 import ErrorState from "../components/common/ErrorState";
 import PageHeader from "./PageHeader";
 import StatusAndProgress from "./StatusAndProgress";
+import type { CustomTagsItem } from "../types";
 
-const ValueMappings: React.FC = () => {
+const CustomTags: React.FC = () => {
   const {
-    data: ValMapsData,
-    setData: setValueMappingsData,
-    filteredData: filteredValMaps,
-    setFilteredData: setFilteredValMaps,
+    data: CustomTagsData,
+    setData: setCustomTagsData,
+    filteredData: filteredVals,
+    setFilteredData: setFilteredVals,
     loading,
     setLoading,
     error,
@@ -30,19 +30,19 @@ const ValueMappings: React.FC = () => {
     setSearchTerm,
     requestSort,
     sortConfig,
-    selectedItems: selectedValMaps,
+    selectedItems: selectedVals,
     handleSelect,
     handleSelectAll,
     isMigrated,
     setIsMigrated,
-  } = useCommonTableState<ValueMappingsItem>("Name");
+  } = useCommonTableState<CustomTagsItem>("tagName");
 
   // ✅ Extract WebSocket handler and wrap it
   const { connectWebSocket: rawConnectWebSocket } =
-    useWebSocketManager<ValueMappingsItem>(
-      setValueMappingsData,
-      setFilteredValMaps,
-      fetchValueMappingsTaskStatus
+    useWebSocketManager<CustomTagsItem>(
+      setCustomTagsData,
+      setFilteredVals,
+      fetchCustomTagsTaskStatus
     );
 
   const connectWebSocket = useCallback(
@@ -51,25 +51,25 @@ const ValueMappings: React.FC = () => {
   );
 
   // ✅ useMigration hook
-  const { handleMigrate } = useMigration<ValueMappingsItem, "Name">({
-    moduleType: "value-mappings",
-    setData: setValueMappingsData,
-    setFilteredData: setFilteredValMaps,
+  const { handleMigrate } = useMigration<CustomTagsItem, "tagName">({
+    moduleType: "custom-tags",
+    setData: setCustomTagsData,
+    setFilteredData: setFilteredVals,
     connectWebSocket,
     setIsMigrated,
-    matchKey: "Name",
+    matchKey: "tagName",
   });
 
   useEffect(() => {
     const loadOAuthCreds = async () => {
       try {
-        const response = await fetchValueMappings();
+        const response = await fetchCustomTags();
         const data = response.data?.results || [];
         console.log(data);
-        setValueMappingsData(data);
-        setFilteredValMaps(data);
+        setCustomTagsData(data);
+        setFilteredVals(data);
       } catch (err) {
-        setError("Failed to load Value Mappings data.");
+        setError("Failed to load Custom Tags data.");
       } finally {
         setLoading(false);
       }
@@ -78,7 +78,7 @@ const ValueMappings: React.FC = () => {
     loadOAuthCreds();
   }, []);
 
-  if (loading) return <AppSpinner text="Loading Value Mappings..." />;
+  if (loading) return <AppSpinner text="Loading Custom Tags..." />;
   if (error) {
     return (
       <ErrorState
@@ -91,14 +91,14 @@ const ValueMappings: React.FC = () => {
   return (
     <div className="p-3">
       <PageHeader
-        title="Value Mapping Values"
+        title="Custom Tags"
         searchPlaceholder="Search..."
         searchTerm={searchTerm}
         setSearchTerm={(val) => setSearchTerm(val)}
         onMigrate={() =>
-          handleMigrate(selectedValMaps, ValMapsData, migrateValueMappings)
+          handleMigrate(selectedVals, CustomTagsData, migrateCustomTags)
         }
-        disableMigrate={selectedValMaps.length === 0}
+        disableMigrate={selectedVals.length === 0}
       />
 
       <ProfileBanner />
@@ -120,66 +120,56 @@ const ValueMappings: React.FC = () => {
                   <Form.Check
                     type="checkbox"
                     checked={
-                      filteredValMaps.length > 0 &&
-                      selectedValMaps.length === filteredValMaps.length
+                      filteredVals.length > 0 &&
+                      selectedVals.length === filteredVals.length
                     }
                     onChange={(e) =>
                       handleSelectAll(
-                        filteredValMaps.map((u) => u.Name),
+                        filteredVals.map((u) => u.tagName),
                         e.target.checked
                       )
                     }
                   />
                 </th>
-                <TableSortable<ValueMappingsItem>
-                  columnKey="Id"
-                  label="Id"
+                <TableSortable<CustomTagsItem>
+                  columnKey="tagName"
+                  label="Tag Name"
                   sortConfig={sortConfig}
                   requestSort={requestSort}
                 />
-                <TableSortable<ValueMappingsItem>
-                  columnKey="Name"
-                  label="Name"
-                  sortConfig={sortConfig}
-                  requestSort={requestSort}
-                />
-                <TableSortable<ValueMappingsItem>
-                  columnKey="Description"
-                  label="Description"
-                  sortConfig={sortConfig}
-                  requestSort={requestSort}
-                />
-                <th>Version</th>
-                <th>PackageId</th>
+                <th>Permitted Values</th>
+                <th>Mandatory</th>
                 {isMigrated && <th className="py-2 px-3">Status</th>}
                 {isMigrated && <th className="py-2 px-3">Progress</th>}
               </tr>
             </thead>
             <tbody>
-              {filteredValMaps.length === 0 ? (
+              {filteredVals.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center text-muted py-3">
-                    No Value Mappings records found.
+                    No Custom Tags records found.
                   </td>
                 </tr>
               ) : (
-                filteredValMaps.map((ValueMap) => (
-                  <tr key={ValueMap.Name}>
+                filteredVals.map((filteredVal) => (
+                  <tr key={filteredVal.tagName}>
                     <td className="py-2 px-3">
                       <Form.Check
                         type="checkbox"
-                        checked={selectedValMaps.includes(ValueMap.Name)}
+                        checked={selectedVals.includes(filteredVal.tagName)}
                         onChange={(e) =>
-                          handleSelect(ValueMap.Name, e.target.checked)
+                          handleSelect(filteredVal.tagName, e.target.checked)
                         }
                       />
                     </td>
-                    <td className="py-2 px-3">{ValueMap.Id || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.Name || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.Description || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.Version || "—"}</td>
-                    <td className="py-2 px-3">{ValueMap.PackageId || "—"}</td>
-                    {isMigrated && <StatusAndProgress {...ValueMap} />}
+                    <td className="py-2 px-3">{filteredVal.tagName || "—"}</td>
+                    <td className="py-2 px-3">
+                      {filteredVal.permittedValues || "—"}
+                    </td>
+                    <td className="py-2 px-3">
+                      {filteredVal.isMandatory || "—"}
+                    </td>
+                    {isMigrated && <StatusAndProgress {...filteredVal} />}
                   </tr>
                 ))
               )}
@@ -191,4 +181,4 @@ const ValueMappings: React.FC = () => {
   );
 };
 
-export default ValueMappings;
+export default CustomTags;

@@ -19,6 +19,11 @@ type MigrateFunction<T> = (
   }
 ) => Promise<{ data: { task_id: string } }>;
 
+// ✅ Type guard to check if "payload" exists
+function hasPayload(obj: any): obj is { payload: any } {
+  return obj && typeof obj === "object" && "payload" in obj;
+}
+
 export const useMigration = <T, K extends keyof T>({
   moduleType,
   setData,
@@ -44,9 +49,14 @@ export const useMigration = <T, K extends keyof T>({
       selectedItems.includes(String(item[matchKey]))
     );
 
+    // ✅ Use payload if present, else fallback to full object
+    const finalPayload = selectedObjects.map((item) =>
+      hasPayload(item) ? item.payload : item
+    );
+
     const payload = {
       module_type: moduleType,
-      data: selectedObjects,
+      data: finalPayload,
       created_by: 1,
     };
 
@@ -59,7 +69,7 @@ export const useMigration = <T, K extends keyof T>({
 
       if (taskId) {
         toast.success("Task submitted. Migration started.");
-        
+
         // ✅ Optional migrated state flag
         if (setIsMigrated) setIsMigrated(true);
 

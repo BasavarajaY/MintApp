@@ -1,8 +1,10 @@
+// src/pages/Profiles.tsx
 import React, { useEffect, useState } from "react";
 import {
   createUFMProfiles,
   deleteProfile,
   fetchMintProfiles,
+  fetchTenants,
   updateProfile,
 } from "../api/auth";
 import toast from "react-hot-toast";
@@ -11,8 +13,11 @@ import ConfirmDialog from "../components/common/ConfirmDialog";
 import AppSpinner from "../components/common/AppSpinner";
 import ErrorState from "../components/common/ErrorState";
 
+const storedUser = sessionStorage.getItem("loggedInUser");
+const userData = storedUser ? JSON.parse(storedUser) : null;
+
 const Profiles: React.FC = () => {
-  const [profilesData, setProfilesData] = useState<any>(null);
+  const [profilesData, setProfilesData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -28,10 +33,32 @@ const Profiles: React.FC = () => {
   }, []);
 
   const loadProfiles = async () => {
+    setLoading(true);
     try {
-      const response = await fetchMintProfiles();
-      setProfilesData(response.data);
-      setFilteredData(response.data);
+      const profilesRes = await fetchMintProfiles();
+      const profiles = profilesRes.data;
+
+      const tenantsRes = await fetchTenants();
+      const tenants = tenantsRes.data?.tenants;
+
+      // Build a map of tenant_id → tenant_name
+      const tenantMap: Record<number, string> = {};
+      tenants.forEach((t: any) => {
+        tenantMap[t.tenant_id] = t.tenant_name;
+      });
+
+      // Enrich profiles with tenant_name
+      const enrichedProfiles = profiles.map((p: any) => ({
+        ...p,
+        source_tenant_name:
+          tenantMap[p.mint_profile_primary_tenant_id] || "Unknown Tenant",
+        target_tenant_name:
+          tenantMap[p.mint_profile_secondary_tenant_id] || "Unknown Tenant",
+      }));
+
+      // ✅ 5. Set state
+      setProfilesData(enrichedProfiles);
+      setFilteredData(enrichedProfiles);
     } catch (error) {
       console.error("Error fetching profile:", error);
       setError("Failed to load profile data.");
@@ -43,25 +70,30 @@ const Profiles: React.FC = () => {
   const handleAddOrUpdateProfile = async (profileData: {
     id?: number | undefined;
     name: string;
-    environment: string;
+    environment: Number;
     source: string;
     destination: string;
+    sourceTenantId: number;
+    targetTenantId: number;
+    created_by: string | number;
+    modified_by: string | number;
   }) => {
     const payload = {
       mint_profile_name: profileData.name,
       mint_profile_environment_id: profileData.environment,
       mint_profile_source_runtime: profileData.source,
       mint_profile_destination_runtime: profileData.destination,
-      mint_profile_primary_tenant_id: 1,
-      mint_profile_secondary_tenant_id: 2,
+      mint_profile_primary_tenant_id: profileData.sourceTenantId,
+      mint_profile_secondary_tenant_id: profileData.targetTenantId,
       mint_profile_gr_id: 101,
       mint_profile_tenant_state_id: 14001,
-      created_by: 1,
+      created_by: userData?.id.toString(),
+      modified_by: userData?.id.toString(),
     };
 
     try {
-      if (isEdit && selectedProfile?.id) {
-        await updateProfile(selectedProfile.id, payload);
+      if (isEdit && selectedProfile?.mint_profile_id) {
+        await updateProfile(selectedProfile.mint_profile_id, payload);
         toast.success("Profile updated successfully");
       } else {
         await createUFMProfiles(payload);
@@ -89,13 +121,7 @@ const Profiles: React.FC = () => {
   }, [searchTerm, profilesData]);
 
   const handleEdit = (profile: any) => {
-    setSelectedProfile({
-      id: profile.mint_profile_id,
-      name: profile.mint_profile_name,
-      environment: profile.mint_profile_environment_id,
-      source: profile.mint_profile_source_runtime,
-      destination: profile.mint_profile_destination_runtime,
-    });
+    setSelectedProfile(profile);
     setIsEdit(true);
     setShowProfileModal(true);
   };
@@ -175,9 +201,8 @@ const Profiles: React.FC = () => {
             <tr>
               <th>Id</th>
               <th>Profile Name</th>
-              <th>Environment</th>
-              <th>Source</th>
-              <th>Destination</th>
+              <th>Source Tenant Name</th>
+              <th>Target Tenant Name</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -193,9 +218,8 @@ const Profiles: React.FC = () => {
                 <tr key={profile.mint_profile_id}>
                   <td>{profile.mint_profile_id}</td>
                   <td>{profile.mint_profile_name}</td>
-                  <td>{profile.mint_profile_environment_id}</td>
-                  <td>{profile.mint_profile_source_runtime}</td>
-                  <td>{profile.mint_profile_destination_runtime}</td>
+                  <td>{profile.source_tenant_name}</td>
+                  <td>{profile.target_tenant_name}</td>
                   <td>
                     <div className="d-flex gap-3 align-items-center">
                       <i
@@ -229,14 +253,13 @@ const Profiles: React.FC = () => {
 
       <ProfileModal
         show={showProfileModal}
-        onClose={() => {
+        handleClose={() => {
           setShowProfileModal(false);
           setIsEdit(false);
           setSelectedProfile(null);
         }}
-        onAdd={handleAddOrUpdateProfile}
+        handleSave={handleAddOrUpdateProfile}
         initialData={selectedProfile}
-        isEdit={isEdit}
       />
 
       <ConfirmDialog
